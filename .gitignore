@@ -1,0 +1,63 @@
+# Test Coverage Reports
+coverage/
+.coverage
+*.lcov
+htmlcov/
+
+# User API (Sinatra)
+user-api/coverage/
+user-api/.bundle/
+user-api/vendor/bundle/
+
+# Admin API (Laravel)
+admin-api/coverage/
+admin-api/vendor/
+admin-api/.phpunit.result.cache
+admin-api/.phpunit.cache
+admin-api/bootstrap/cache/
+admin-api/storage/framework/cache/
+admin-api/storage/framework/sessions/
+admin-api/storage/framework/views/
+admin-api/storage/logs/
+admin-api/database/database.sqlite
+
+# Frontend (React)
+frontend/coverage/
+frontend/node_modules/
+frontend/.env.test.local
+frontend/build/
+
+# E2E (Playwright)
+e2e/node_modules/
+e2e/playwright-report/
+e2e/test-results/
+e2e/.playwright/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.test
+.env.production.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+admin-api/public/storage/
+admin-api/storage/
+admin-api/public/storage/
+admin-api/public/storage
+user-api/Gemfile.lock
+user-api/db/schema.rb
