@@ -1,0 +1,43 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: shopping_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: shopping_development
+      MYSQL_USER: shopping_user
+      MYSQL_PASSWORD: shopping_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - shopping_network
+
+  rails_api:
+    build:
+      context: ./user-api
+      dockerfile: Dockerfile
+    container_name: shopping_rails_api
+    environment:
+      DATABASE_URL: mysql2://shopping_user:shopping_password@mysql:3306/shopping_development
+      RAILS_ENV: development
+    ports:
+      - "3001:3000"
+    depends_on:
+      - mysql
+    networks:
+      - shopping_network
+    command: >
+      sh -c "
+        rm -f tmp/pids/server.pid &&
+        bundle exec rails db:migrate 2>/dev/null || bundle exec rails db:migrate &&
+        bundle exec rails server -b 0.0.0.0 -p 3000
+      "
+
+volumes:
+  mysql_data:
+
+networks:
+  shopping_network:
+    driver: bridge
