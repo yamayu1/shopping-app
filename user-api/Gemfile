@@ -1,0 +1,21 @@
+source 'https://rubygems.org'
+
+ruby '3.1.7'
+
+gem 'rails', '~> 7.0'
+gem 'puma'
+gem 'mysql2'
+gem 'bcrypt'
+gem 'jwt'
+gem 'rack-cors'
+gem 'kaminari'
+gem 'active_storage_validations'
+
+group :test do
+  gem 'minitest'
+  gem 'rack-test'
+  gem 'simplecov', require: false
+  gem 'database_cleaner'
+  gem 'factory_bot_rails'
+  gem 'faker'
+end
