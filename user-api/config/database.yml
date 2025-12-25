@@ -1,0 +1,15 @@
+default: &default
+  adapter: mysql2
+  encoding: utf8mb4
+  pool: 5
+  username: shopping_user
+  password: shopping_password
+  host: mysql
+
+development:
+  <<: *default
+  database: shopping_development
+
+test:
+  <<: *default
+  database: shopping_test
