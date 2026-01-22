@@ -13,11 +13,32 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      try {
+        const parsedToken = JSON.parse(token);
+        config.headers.Authorization = `Bearer ${parsedToken}`;
+      } catch {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// 401の場合はログイン画面にリダイレクト
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+      // ログインページにいる場合はリダイレクトしない（無限ループ防止）
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
     return Promise.reject(error);
   }
 );
