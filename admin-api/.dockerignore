@@ -1,0 +1,11 @@
+vendor/
+node_modules/
+.env
+public/storage
+storage/*.key
+storage/app/public/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+.phpunit.result.cache
