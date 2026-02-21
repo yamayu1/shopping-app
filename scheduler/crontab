@@ -1,0 +1,5 @@
+# 毎日9時（JST）に在庫データをエクスポート
+0 9 * * * cd /app && /usr/local/bin/ruby export_inventory.rb
+
+# テスト用: 毎時エクスポートする場合
+# 0 * * * * cd /app && /usr/local/bin/ruby export_inventory.rb
