@@ -1,0 +1,20 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    csv (3.3.5)
+    logger (1.7.0)
+    mysql2 (0.5.6)
+
+PLATFORMS
+  aarch64-linux-musl
+
+DEPENDENCIES
+  csv
+  logger
+  mysql2 (~> 0.5)
+
+RUBY VERSION
+   ruby 3.1.7p220
+
+BUNDLED WITH
+   2.3.27
