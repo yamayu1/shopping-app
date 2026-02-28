@@ -68,7 +68,7 @@ class CartsController < ApplicationController
             price: item.product.price.to_f,
             sku: item.product.sku,
             stock_quantity: item.product.stock_quantity,
-            is_active: item.product.is_active,
+            is_active: item.product.active?,
             main_image: item.product.main_image&.url
           },
           quantity: item.quantity,
