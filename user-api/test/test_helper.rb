@@ -25,4 +25,9 @@ class ActiveSupport::TestCase
     )
     { 'Authorization' => "Bearer #{token}" }
   end
+
+  # JSONレスポンスパース用ヘルパーメソッド
+  def json_response
+    JSON.parse(response.body, symbolize_names: true)
+  end
 end
