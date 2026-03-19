@@ -1,0 +1,18 @@
+{
+  "name": "shopping-app-e2e",
+  "version": "1.0.0",
+  "description": "E2E tests for shopping app",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
+    "test:user": "playwright test user-purchase-flow",
+    "test:admin": "playwright test admin-workflow",
+    "test:ci": "playwright test --reporter=junit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0"
+  }
+}
