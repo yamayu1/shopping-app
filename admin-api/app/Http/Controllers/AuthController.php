@@ -18,6 +18,7 @@ class AuthController extends Controller
         $this->middleware('auth:admin', ['except' => ['login', 'register']]);
     }
 
+    // ログイン処理
     public function login(Request $request): JsonResponse
     {
         try {
@@ -38,6 +39,7 @@ class AuthController extends Controller
                 return $this->errorResponse('Invalid credentials', null, 401);
             }
 
+            // 無効化されたアカウントはログインさせない
             if (!$admin->is_active) {
                 return $this->errorResponse('Account is deactivated', null, 403);
             }
@@ -163,27 +165,22 @@ class AuthController extends Controller
 
     public function updateProfile(Request $request): JsonResponse
     {
-        try {
-            $admin = auth('admin')->user();
+        $admin = auth('admin')->user();
 
-            $validator = Validator::make($request->all(), [
-                'name' => 'sometimes|required|string|max:255',
-                'email' => 'sometimes|required|string|email|max:255|unique:admins,email,' . $admin->id,
-            ]);
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|string|email|max:255|unique:admins,email,' . $admin->id,
+        ]);
 
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
-            $admin->update($request->only(['name', 'email']));
-
-            return $this->successResponse('Profile updated successfully', [
-                'admin' => $admin->only(['id', 'name', 'email', 'role', 'is_active', 'last_login_at', 'updated_at'])
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->errorResponse('Failed to update profile', $e->getMessage(), 500);
+        if ($validator->fails()) {
+            return $this->errorResponse('Validation failed', $validator->errors(), 422);
         }
+
+        $admin->update($request->only(['name', 'email']));
+
+        return $this->successResponse('Profile updated successfully', [
+            'admin' => $admin->only(['id', 'name', 'email', 'role', 'is_active', 'last_login_at', 'updated_at'])
+        ]);
     }
 
     public function getAdmins(Request $request): JsonResponse

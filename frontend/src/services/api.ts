@@ -9,9 +9,11 @@ const api = axios.create({
   },
 });
 
+// リクエスト送信前にトークンをヘッダーにセットする
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    // console.log('リクエスト送信:', config.url);
     if (token) {
       try {
         const parsedToken = JSON.parse(token);

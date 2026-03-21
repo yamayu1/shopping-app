@@ -19,9 +19,13 @@ const mockCart: Cart = {
         description: 'Test',
         price: 1000,
         category_id: 1,
+        sku: 'TEST-010',
         stock_quantity: 50,
         images: [],
         is_active: true,
+        is_featured: false,
+        created_at: '2026-01-01T00:00:00Z',
+        updated_at: '2026-01-01T00:00:00Z',
       },
       quantity: 2,
       price: 1000,
@@ -29,6 +33,8 @@ const mockCart: Cart = {
   ],
   total_price: 2000,
   total_items: 2,
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
 };
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -103,10 +109,7 @@ describe('CartContext', () => {
       await result.current.addToCart(20, 1);
     });
 
-    expect(cartService.addItem).toHaveBeenCalledWith({
-      product_id: 20,
-      quantity: 1,
-    });
+    expect(cartService.addItem).toHaveBeenCalledWith(20, 1);
     expect(result.current.cart).toEqual(updatedCart);
   });
 

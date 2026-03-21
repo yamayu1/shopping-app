@@ -17,6 +17,7 @@ class OrderController extends Controller
         $this->middleware('check.permission:manage_orders');
     }
 
+    // 注文一覧。ステータスや期間で絞り込み可能
     public function index(Request $request): JsonResponse
     {
         try {
@@ -87,19 +88,14 @@ class OrderController extends Controller
     }
     public function show(string $orderNumber): JsonResponse
     {
-        try {
-            $order = Order::with([
-                'user:id,name,email,phone',
-                'orderItems.product:id,name,sku,images'
-            ])->where('order_number', $orderNumber)->firstOrFail();
+        $order = Order::with([
+            'user:id,name,email,phone',
+            'orderItems.product:id,name,sku,images'
+        ])->where('order_number', $orderNumber)->firstOrFail();
 
-            return $this->successResponse('Order retrieved successfully', [
-                'order' => $order
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->errorResponse('Order not found', $e->getMessage(), 404);
-        }
+        return $this->successResponse('Order retrieved successfully', [
+            'order' => $order
+        ]);
     }
     public function updateStatus(Request $request, string $orderNumber): JsonResponse
     {

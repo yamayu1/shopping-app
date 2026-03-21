@@ -22,7 +22,7 @@ const mockCart: Cart = {
         stock_quantity: 50,
         images: [],
         is_active: true,
-        featured: false,
+        is_featured: false,
         created_at: '2024-01-01T00:00:00Z',
         updated_at: '2024-01-01T00:00:00Z',
       },
@@ -42,7 +42,7 @@ const mockCart: Cart = {
         stock_quantity: 10,
         images: [],
         is_active: true,
-        featured: false,
+        is_featured: false,
         created_at: '2024-01-01T00:00:00Z',
         updated_at: '2024-01-01T00:00:00Z',
       },
@@ -81,7 +81,7 @@ describe('cartService', () => {
     it('adds an item to the cart', async () => {
       mockedApiClient.post.mockResolvedValue({ data: { cart: mockCart } });
 
-      const result = await cartService.addItem({ product_id: 10, quantity: 2 });
+      const result = await cartService.addItem(10, 2);
 
       expect(mockedApiClient.post).toHaveBeenCalledWith('/cart/items', {
         product_id: 10,

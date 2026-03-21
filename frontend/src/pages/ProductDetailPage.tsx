@@ -14,8 +14,6 @@ import {
   CardMedia,
   TextField,
   IconButton,
-  Breadcrumbs,
-  Link,
   Stack,
 } from '@mui/material';
 import {
@@ -25,8 +23,6 @@ import {
   Star,
   LocalShipping,
   Verified,
-  Home,
-  ChevronRight,
 } from '@mui/icons-material';
 import { Product } from '../types';
 import { productService } from '../services/productService';
@@ -49,6 +45,7 @@ const ProductDetailPage: React.FC = () => {
 
   useEffect(() => {
     if (id) {
+      console.log('商品ID:', id);
       loadProduct(Number(id));
     }
   }, [id]);
@@ -58,6 +55,7 @@ const ProductDetailPage: React.FC = () => {
       setLoading(true);
       setError(null);
       const data = await productService.getProduct(productId);
+      console.log('商品データ:', data);
       setProduct(data);
     } catch (err: any) {
       console.error('商品の取得エラー:', err);
@@ -77,7 +75,7 @@ const ProductDetailPage: React.FC = () => {
 
     try {
       setAddingToCart(true);
-      await cartService.addItem({ product_id: product.id, quantity });
+      await cartService.addItem(product.id, quantity);
       setError(null);
       // 成功メッセージを表示
       alert('カートに追加しました');
@@ -131,40 +129,6 @@ const ProductDetailPage: React.FC = () => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ py: 4 }}>
-        {/* パンくずリスト */}
-        <Breadcrumbs separator={<ChevronRight fontSize="small" />} sx={{ mb: 3 }}>
-          <Link
-            component="button"
-            variant="body2"
-            onClick={() => navigate(ROUTES.HOME)}
-            sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
-          >
-            <Home sx={{ mr: 0.5, fontSize: 18 }} />
-            ホーム
-          </Link>
-          <Link
-            component="button"
-            variant="body2"
-            onClick={() => navigate(ROUTES.PRODUCTS)}
-            sx={{ textDecoration: 'none' }}
-          >
-            商品一覧
-          </Link>
-          {product.category && (
-            <Link
-              component="button"
-              variant="body2"
-              onClick={() => navigate(`${ROUTES.PRODUCTS}?category=${product.category?.id}`)}
-              sx={{ textDecoration: 'none' }}
-            >
-              {product.category.name}
-            </Link>
-          )}
-          <Typography variant="body2" color="text.primary">
-            {product.name}
-          </Typography>
-        </Breadcrumbs>
-
         {error && (
           <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
             {error}
@@ -174,7 +138,7 @@ const ProductDetailPage: React.FC = () => {
         <Grid container spacing={4}>
           {/* 左側: 画像ギャラリー */}
           <Grid item xs={12} md={6}>
-            <Box sx={{ position: 'sticky', top: 80 }}>
+            <Box>
               {/* メイン画像 */}
               <Card sx={{ mb: 2, position: 'relative' }}>
                 <CardMedia

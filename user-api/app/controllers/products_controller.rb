@@ -1,13 +1,15 @@
 class ProductsController < ApplicationController
   skip_before_action :authenticate_user!, only: [:index, :show, :search, :categories, :featured]
 
+  # 商品一覧。フィルターとページネーション付き
   def index
     @products = Product.active.includes(:category, images_attachments: :blob)
-    
+
+    # カテゴリや検索条件があれば絞り込む
     @products = @products.by_category(params[:category_id]) if params[:category_id].present?
     @products = @products.search_by_name(params[:search]) if params[:search].present?
     @products = @products.in_stock if params[:in_stock] == 'true'
-    
+
     @products = @products.page(params[:page]).per(params[:per_page] || 20)
     
     render_success({
@@ -41,6 +43,7 @@ class ProductsController < ApplicationController
     })
   end
 
+  # トップページに表示するおすすめ商品
   def featured
     limit = params[:limit] || 8
     @products = Product.active
@@ -70,6 +73,15 @@ class ProductsController < ApplicationController
   end
 
   private
+
+  def pagination_data(collection)
+    {
+      current_page: collection.current_page,
+      total_pages: collection.total_pages,
+      total: collection.total_count,
+      per_page: collection.limit_value
+    }
+  end
 
   def product_data(product, detailed: false)
     data = {

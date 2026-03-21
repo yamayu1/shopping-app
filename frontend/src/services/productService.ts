@@ -48,7 +48,6 @@ export const productService = {
     return response.data;
   },
 
-  // 商品を検索
   searchProducts: async (
     query: string,
     filters: Omit<ProductFilters, 'search'> = {},
@@ -81,7 +80,6 @@ export const productService = {
     return response.data;
   },
 
-  // カテゴリ別に商品を取得
   getProductsByCategory: async (
     categoryId: number,
     page: number = 1,

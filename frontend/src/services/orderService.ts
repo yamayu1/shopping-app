@@ -14,13 +14,12 @@ export interface OrderFilters {
 }
 
 export const orderService = {
-  // 新規注文を作成
   createOrder: async (orderData: CreateOrderData): Promise<Order> => {
     const response = await apiClient.post<any>('/orders', orderData);
     return response.data?.order;
   },
 
-  // 現在のユーザーの注文一覧を取得
+  // 注文一覧を取得。フィルターはURLSearchParamsで組み立てている
   getOrders: async (filters?: OrderFilters): Promise<PaginatedResponse<Order>> => {
     const params = new URLSearchParams();
 
@@ -44,13 +43,11 @@ export const orderService = {
     };
   },
 
-  // 注文をIDで取得
   getOrderById: async (orderId: number): Promise<Order> => {
     const response = await apiClient.get<any>(`/orders/${orderId}`);
     return response.data?.order;
   },
 
-  // 注文をキャンセル（キャンセル可能な場合）
   cancelOrder: async (orderId: number): Promise<Order> => {
     const response = await apiClient.put<any>(`/orders/${orderId}/cancel`);
     return response.data?.order;

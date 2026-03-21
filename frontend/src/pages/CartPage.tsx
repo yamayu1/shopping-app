@@ -230,7 +230,7 @@ const CartPage: React.FC = () => {
 
             {/* 注文サマリー */}
             <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 3, position: 'sticky', top: 80 }}>
+              <Paper sx={{ p: 3 }}>
                 <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
                   注文サマリー
                 </Typography>

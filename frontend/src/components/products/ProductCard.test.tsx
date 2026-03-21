@@ -12,10 +12,15 @@ const mockProduct: Product = {
   stock_quantity: 20,
   category_id: 1,
   is_active: true,
+  sku: 'TEST-001',
+  is_featured: false,
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
   category: {
     id: 1,
     name: 'Electronics',
     is_active: true,
+    sort_order: 0,
   },
   images: [
     {

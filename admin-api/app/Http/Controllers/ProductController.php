@@ -24,6 +24,7 @@ class ProductController extends Controller
         try {
             $query = Product::with(['category:id,name,slug']);
 
+            // フィルター条件
             if ($request->has('category_id')) {
                 $query->byCategory($request->category_id);
             }
@@ -87,7 +88,7 @@ class ProductController extends Controller
         }
     }
 
-    // TODO: バリデーションもう少し厳しくしたい
+    // 商品登録。バリデーションは今後もう少し厳密にする予定
     public function store(Request $request): JsonResponse
     {
         try {
@@ -159,7 +160,7 @@ class ProductController extends Controller
             } catch (\Exception $e) {
                 DB::rollBack();
                 
-                // 失敗時にアップロード画像をクリーンアップ
+                // 失敗時にアップロード済み画像を削除
                 foreach ($imagePaths as $path) {
                     Storage::disk('public')->delete($path);
                 }
@@ -174,25 +175,20 @@ class ProductController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        try {
-            $product = Product::with([
-                'category:id,name,slug',
-                'inventoryLogs' => function ($query) {
-                    $query->with('admin:id,name')->latest()->limit(10);
-                }
-            ])->findOrFail($id);
+        $product = Product::with([
+            'category:id,name,slug',
+            'inventoryLogs' => function ($query) {
+                $query->with('admin:id,name')->latest()->limit(10);
+            }
+        ])->findOrFail($id);
 
-            $product->total_sales = $product->getTotalSales();
-            $product->total_revenue = $product->getTotalRevenue();
-            $product->profit_margin = $product->getProfitMargin();
+        $product->total_sales = $product->getTotalSales();
+        $product->total_revenue = $product->getTotalRevenue();
+        $product->profit_margin = $product->getProfitMargin();
 
-            return $this->successResponse('Product retrieved successfully', [
-                'product' => $product
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->errorResponse('Product not found', $e->getMessage(), 404);
-        }
+        return $this->successResponse('Product retrieved successfully', [
+            'product' => $product
+        ]);
     }
 
     public function update(Request $request, int $id): JsonResponse
@@ -292,6 +288,7 @@ class ProductController extends Controller
         }
     }
 
+    // 商品を削除。注文に紐づいている商品は削除不可
     public function destroy(int $id): JsonResponse
     {
         try {
@@ -386,17 +383,12 @@ class ProductController extends Controller
 
     public function toggleStatus(int $id): JsonResponse
     {
-        try {
-            $product = Product::findOrFail($id);
-            $product->update(['is_active' => !$product->is_active]);
+        $product = Product::findOrFail($id);
+        $product->update(['is_active' => !$product->is_active]);
 
-            return $this->successResponse('Product status updated successfully', [
-                'product' => $product->only(['id', 'name', 'is_active'])
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->errorResponse('Failed to update product status', $e->getMessage(), 500);
-        }
+        return $this->successResponse('Product status updated successfully', [
+            'product' => $product->only(['id', 'name', 'is_active'])
+        ]);
     }
 
     public function analytics(int $id): JsonResponse

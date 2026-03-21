@@ -82,6 +82,7 @@ const ProductsPage: React.FC = () => {
         12
       );
 
+      console.log('商品一覧取得:', response.data?.length, '件');
       setProducts(response.data || []);
       setTotalPages(response.pagination?.total_pages || 1);
 
@@ -107,7 +108,7 @@ const ProductsPage: React.FC = () => {
     }
 
     try {
-      await cartService.addItem({ product_id: product.id, quantity: 1 });
+      await cartService.addItem(product.id, 1);
     } catch (err: any) {
       console.error('カート追加エラー:', err);
       setError('カートへの追加に失敗しました');
