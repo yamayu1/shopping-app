@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('inventory_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('products');
-            $table->foreignId('admin_id')->nullable()->constrained('admins');
+            $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('admin_id')->nullable();
+            $table->foreign('admin_id')->references('id')->on('admins');
             $table->integer('quantity_change'); // 正の値（入荷）または負の値（出荷）
             $table->integer('quantity_after');
             $table->string('reason');

@@ -336,7 +336,7 @@ const AdminCategories: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {categories.length === 0 ? (
+              {!categories || categories.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} align="center" sx={{ py: 8 }}>
                     <Typography variant="body1" color="text.secondary">

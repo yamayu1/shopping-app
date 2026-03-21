@@ -10,7 +10,7 @@ import {
   Alert,
 } from '@mui/material';
 import { ArrowForward } from '@mui/icons-material';
-import { Product } from '../types';
+import { Product, Category } from '../types';
 import { productService } from '../services/productService';
 import { cartService } from '../services/cartService';
 import ProductCard from '../components/products/ProductCard';
@@ -23,11 +23,22 @@ const HomePage: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [addToCartLoading, setAddToCartLoading] = useState<number | null>(null);
 
   useEffect(() => {
     loadFeaturedProducts();
+    loadCategories();
   }, []);
+
+  const loadCategories = async () => {
+    try {
+      const data = await productService.getCategories();
+      setCategories(data);
+    } catch (err: any) {
+      console.error('Failed to load categories:', err);
+    }
+  };
 
   const loadFeaturedProducts = async () => {
     try {
@@ -108,6 +119,40 @@ const HomePage: React.FC = () => {
           </Button>
         </Box>
 
+        {/* Categories Section */}
+        {categories.length > 0 && (
+          <Box sx={{ mb: 6 }}>
+            <Typography variant="h4" component="h2" sx={{ fontWeight: 600, mb: 3 }}>
+              カテゴリから探す
+            </Typography>
+            <Grid container spacing={2}>
+              {categories.map((category) => (
+                <Grid item xs={6} md={3} key={category.id}>
+                  <Box
+                    sx={{
+                      p: 3,
+                      border: 1,
+                      borderColor: 'divider',
+                      borderRadius: 2,
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        borderColor: 'primary.main',
+                        bgcolor: 'primary.50',
+                        transform: 'translateY(-2px)',
+                      },
+                    }}
+                    onClick={() => navigate(`${ROUTES.PRODUCTS}?category=${category.id}`)}
+                  >
+                    <Typography variant="h6">{category.name}</Typography>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
+
         {/* Featured Products Section */}
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -153,37 +198,6 @@ const HomePage: React.FC = () => {
           )}
         </Box>
 
-        {/* Categories Section */}
-        <Box sx={{ mt: 8 }}>
-          <Typography variant="h4" component="h2" sx={{ fontWeight: 600, mb: 3 }}>
-            カテゴリから探す
-          </Typography>
-          <Grid container spacing={2}>
-            {['エレクトロニクス', 'ファッション', 'ホーム＆キッチン', 'スポーツ'].map((category) => (
-              <Grid item xs={6} md={3} key={category}>
-                <Box
-                  sx={{
-                    p: 3,
-                    border: 1,
-                    borderColor: 'divider',
-                    borderRadius: 2,
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    '&:hover': {
-                      borderColor: 'primary.main',
-                      bgcolor: 'primary.50',
-                      transform: 'translateY(-2px)',
-                    },
-                  }}
-                  onClick={handleViewAllProducts}
-                >
-                  <Typography variant="h6">{category}</Typography>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
       </Box>
     </Container>
   );

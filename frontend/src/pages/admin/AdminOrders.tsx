@@ -75,8 +75,8 @@ const AdminOrders: React.FC = () => {
       }
 
       const response = await adminOrderService.getOrders(filters);
-      setOrders(response.data);
-      setTotalCount(response.pagination.total);
+      setOrders(response.data || []);
+      setTotalCount(response.pagination?.total || 0);
     } catch (err: any) {
       console.error('Failed to load orders:', err);
       setError('注文データの読み込みに失敗しました');
@@ -205,7 +205,7 @@ const AdminOrders: React.FC = () => {
                       <CircularProgress />
                     </TableCell>
                   </TableRow>
-                ) : orders.length === 0 ? (
+                ) : !orders || orders.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} align="center" sx={{ py: 8 }}>
                       <Typography variant="body1" color="text.secondary">

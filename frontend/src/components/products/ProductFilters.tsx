@@ -114,7 +114,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       {/* ヘッダー */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          Filters
+          フィルター
           {getActiveFiltersCount() > 0 && (
             <Chip
               label={getActiveFiltersCount()}
@@ -130,17 +130,17 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
           size="small"
           disabled={getActiveFiltersCount() === 0}
         >
-          Clear All
+          すべてクリア
         </Button>
       </Box>
 
       {/* Sort */}
       <Box sx={{ mb: 3 }}>
         <FormControl fullWidth size="small">
-          <InputLabel>Sort By</InputLabel>
+          <InputLabel>並び替え</InputLabel>
           <Select
             value={getSortValue()}
-            label="Sort By"
+            label="並び替え"
             onChange={(e) => handleSortChange(e.target.value)}
           >
             {PRODUCT_SORT_OPTIONS.map((option) => (
@@ -158,7 +158,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-            Categories
+            カテゴリー
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
@@ -191,7 +191,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-            Price Range
+            価格帯
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
@@ -212,7 +212,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
             />
             <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
               <TextField
-                label="Min"
+                label="最小"
                 type="number"
                 size="small"
                 value={localPriceRange[0]}
@@ -222,11 +222,11 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                 }}
                 onBlur={handlePriceRangeCommitted}
                 InputProps={{
-                  startAdornment: '$',
+                  startAdornment: '¥',
                 }}
               />
               <TextField
-                label="Max"
+                label="最大"
                 type="number"
                 size="small"
                 value={localPriceRange[1]}
@@ -236,7 +236,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                 }}
                 onBlur={handlePriceRangeCommitted}
                 InputProps={{
-                  startAdornment: '$',
+                  startAdornment: '¥',
                 }}
               />
             </Box>
@@ -248,7 +248,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-            Additional Filters
+            その他のフィルター
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
@@ -260,7 +260,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   onChange={(e) => handleFeaturedChange(e.target.checked)}
                 />
               }
-              label="Featured Products"
+              label="おすすめ商品"
             />
             <FormControlLabel
               control={
@@ -269,7 +269,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   onChange={(e) => handleInStockChange(e.target.checked)}
                 />
               }
-              label="In Stock Only"
+              label="在庫ありのみ"
             />
           </FormGroup>
         </AccordionDetails>

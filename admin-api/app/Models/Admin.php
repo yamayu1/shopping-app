@@ -55,6 +55,22 @@ class Admin extends Authenticatable implements JWTSubject
         return $this->role === self::ROLE_SUPER_ADMIN;
     }
 
+    // 権限チェック
+    public function canManageProducts(): bool
+    {
+        return in_array($this->role, ['super_admin', 'admin', 'manager']);
+    }
+
+    public function canManageOrders(): bool
+    {
+        return in_array($this->role, ['super_admin', 'admin', 'manager']);
+    }
+
+    public function canManageUsers(): bool
+    {
+        return in_array($this->role, ['super_admin', 'admin']);
+    }
+
     // アクティブな管理者のみ取得
     public function scopeActive($query)
     {

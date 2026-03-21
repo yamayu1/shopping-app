@@ -15,7 +15,12 @@ adminApiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      try {
+        const parsedToken = JSON.parse(token);
+        config.headers.Authorization = `Bearer ${parsedToken}`;
+      } catch {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -80,7 +85,7 @@ export const adminAuthService = {
         const { access_token, admin } = response.data.data;
 
         // トークンと管理者データを保存
-        localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, access_token);
+        localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify(access_token));
         localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(admin));
 
         return admin;

@@ -20,7 +20,7 @@ class AdminSeeder extends Seeder
                 'name' => 'Super Admin',
                 'email' => 'superadmin@example.com',
                 'password' => Hash::make('password123'),
-                'role' => Admin::ROLES['super_admin'],
+                'role' => 'super_admin',
                 'is_active' => true,
             ]
         );
@@ -32,7 +32,7 @@ class AdminSeeder extends Seeder
                 'name' => 'Admin User',
                 'email' => 'admin@example.com',
                 'password' => Hash::make('password123'),
-                'role' => Admin::ROLES['admin'],
+                'role' => 'admin',
                 'is_active' => true,
             ]
         );
@@ -44,7 +44,7 @@ class AdminSeeder extends Seeder
                 'name' => 'Manager User',
                 'email' => 'manager@example.com',
                 'password' => Hash::make('password123'),
-                'role' => Admin::ROLES['manager'],
+                'role' => 'manager',
                 'is_active' => true,
             ]
         );
@@ -56,7 +56,7 @@ class AdminSeeder extends Seeder
                 'name' => 'Editor User',
                 'email' => 'editor@example.com',
                 'password' => Hash::make('password123'),
-                'role' => Admin::ROLES['editor'],
+                'role' => 'editor',
                 'is_active' => true,
             ]
         );

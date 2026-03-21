@@ -68,8 +68,12 @@ export const adminInventoryService = {
     const queryString = params.toString();
     const url = queryString ? `/admin/inventory?${queryString}` : '/admin/inventory';
 
-    const response = await adminApiClient.get<AdminApiResponse<PaginatedResponse<InventoryItem>>>(url);
-    return response.data.data;
+    const response = await adminApiClient.get<any>(url);
+    const apiData = response.data.data || response.data;
+    return {
+      data: apiData.products || apiData.inventory || [],
+      pagination: apiData.pagination || { current_page: 1, per_page: 15, total: 0, total_pages: 1 },
+    };
   },
 
   // 商品IDで在庫情報を取得

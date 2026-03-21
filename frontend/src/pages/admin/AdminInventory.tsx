@@ -102,8 +102,8 @@ const AdminInventory: React.FC = () => {
       }
 
       const response = await adminInventoryService.getInventory(filters);
-      setInventory(response.data);
-      setTotalCount(response.pagination.total);
+      setInventory(response.data || []);
+      setTotalCount(response.pagination?.total || 0);
     } catch (err: any) {
       console.error('Failed to load inventory:', err);
       setError(getErrorMessage(err));
@@ -367,7 +367,7 @@ const AdminInventory: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {inventory.length === 0 ? (
+              {!inventory || inventory.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={9} align="center" sx={{ py: 8 }}>
                     <Typography variant="body1" color="text.secondary">

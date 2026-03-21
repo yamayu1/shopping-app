@@ -52,8 +52,12 @@ export const adminCategoryService = {
     const queryString = params.toString();
     const url = queryString ? `/admin/categories?${queryString}` : '/admin/categories';
 
-    const response = await adminApiClient.get<AdminApiResponse<PaginatedResponse<Category>>>(url);
-    return response.data.data;
+    const response = await adminApiClient.get<any>(url);
+    const apiData = response.data.data || response.data;
+    return {
+      data: apiData.categories || [],
+      pagination: apiData.pagination || { current_page: 1, per_page: 15, total: 0, total_pages: 1 },
+    };
   },
 
   // カテゴリをツリー構造（階層構造）で取得

@@ -43,8 +43,12 @@ export const adminOrderService = {
     const queryString = params.toString();
     const url = queryString ? `/admin/orders?${queryString}` : '/admin/orders';
 
-    const response = await adminApiClient.get<AdminApiResponse<PaginatedResponse<Order>>>(url);
-    return response.data.data;
+    const response = await adminApiClient.get<any>(url);
+    const apiData = response.data.data || response.data;
+    return {
+      data: apiData.orders || [],
+      pagination: apiData.pagination || { current_page: 1, per_page: 10, total: 0, total_pages: 1 },
+    };
   },
 
   // 注文をIDで取得

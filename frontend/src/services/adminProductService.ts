@@ -55,8 +55,12 @@ export const adminProductService = {
     const queryString = params.toString();
     const url = queryString ? `/admin/products?${queryString}` : '/admin/products';
 
-    const response = await adminApiClient.get<AdminApiResponse<PaginatedResponse<Product>>>(url);
-    return response.data.data;
+    const response = await adminApiClient.get<any>(url);
+    const apiData = response.data.data || response.data;
+    return {
+      data: apiData.products || [],
+      pagination: apiData.pagination || { current_page: 1, per_page: 15, total: 0, total_pages: 1 },
+    };
   },
 
   // 商品をIDで取得

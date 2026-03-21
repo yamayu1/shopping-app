@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -95,6 +96,16 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
         
         // 一括操作
         Route::put('/bulk/stock', [InventoryController::class, 'bulkUpdateStock']);
+    });
+
+    // ユーザー管理ルート
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::get('/statistics', [UserController::class, 'statistics']);
+        Route::get('/{id}', [UserController::class, 'show']);
+        Route::put('/{id}/status', [UserController::class, 'updateStatus']);
+        Route::delete('/{id}', [UserController::class, 'destroy']);
+        Route::get('/{id}/orders', [UserController::class, 'getUserOrders']);
     });
 
     // ダッシュボード・分析ルート
