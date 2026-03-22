@@ -20,19 +20,21 @@ class OrdersController < ApplicationController
     })
   end
 
+  # 注文作成。在庫チェック→在庫減算→注文作成をトランザクションで実行
   def create
     address = current_user.addresses.find(params[:address_id])
-    
+
     if current_user.cart.empty?
       return render_error('Cart is empty', :bad_request)
     end
-    
+
+    # 先に在庫が足りるか確認
     current_user.cart.cart_items.each do |item|
       unless item.product.can_purchase?(item.quantity)
         return render_error("Insufficient stock for #{item.product.name}", :bad_request)
       end
     end
-    
+
     ActiveRecord::Base.transaction do
       current_user.cart.cart_items.each do |item|
         unless item.product.reduce_stock(item.quantity)

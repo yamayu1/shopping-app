@@ -2,19 +2,20 @@ class Product < ApplicationRecord
   belongs_to :category
   has_many :cart_items, dependent: :destroy
   has_many :order_items, dependent: :destroy
-  has_many_attached :images
-
   validates :name, presence: true
   validates :description, presence: true
   validates :price, presence: true, numericality: { greater_than: 0 }
   validates :stock_quantity, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :sku, presence: true, uniqueness: true
 
-  enum status: { active: 0, inactive: 1, discontinued: 2 }
-
+  scope :active, -> { where(is_active: true) }
   scope :in_stock, -> { where('stock_quantity > 0') }
   scope :by_category, ->(category_id) { where(category_id: category_id) }
   scope :search_by_name, ->(query) { where('name LIKE ?', "%#{query}%") }
+
+  def active?
+    is_active
+  end
 
   def in_stock?
     stock_quantity > 0 && active?
@@ -37,6 +38,7 @@ class Product < ApplicationRecord
   end
 
   def main_image
-    images.attached? ? images.first : nil
+    return nil unless images.is_a?(Array) && images.any?
+    images.first
   end
 end

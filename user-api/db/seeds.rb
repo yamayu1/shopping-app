@@ -60,7 +60,7 @@ products.each do |product_data|
     product.price = product_data[:price]
     product.stock_quantity = product_data[:stock_quantity]
     product.category = product_data[:category]
-    product.status = :active
+    product.is_active = true
   end
 end
 

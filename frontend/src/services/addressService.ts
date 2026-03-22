@@ -5,32 +5,32 @@ export type { CreateAddressData } from '../types';
 
 export const addressService = {
   getAddresses: async (): Promise<Address[]> => {
-    const response = await apiClient.get<any>('/addresses');
-    return response.data?.addresses || [];
+    const { data } = await apiClient.get<any>('/addresses');
+    return data?.addresses || [];
   },
 
   getAddressById: async (addressId: number): Promise<Address> => {
-    const response = await apiClient.get<any>(`/addresses/${addressId}`);
-    return response.data?.address;
+    const { data } = await apiClient.get<any>(`/addresses/${addressId}`);
+    return data?.address;
   },
 
   createAddress: async (addressData: CreateAddressData): Promise<Address> => {
-    const response = await apiClient.post<any>('/addresses', addressData);
-    return response.data?.address;
+    const { data } = await apiClient.post<any>('/addresses', addressData);
+    return data?.address;
   },
 
   updateAddress: async (addressId: number, addressData: Partial<CreateAddressData>): Promise<Address> => {
-    const response = await apiClient.put<any>(`/addresses/${addressId}`, addressData);
-    return response.data?.address;
+    const res = await apiClient.put<any>(`/addresses/${addressId}`, addressData);
+    return res.data?.address;
   },
 
   deleteAddress: async (addressId: number): Promise<void> => {
-    await apiClient.delete<any>(`/addresses/${addressId}`);
+    await apiClient.delete(`/addresses/${addressId}`);
   },
 
   setDefaultAddress: async (addressId: number): Promise<Address> => {
-    const response = await apiClient.put<any>(`/addresses/${addressId}/set_default`);
-    return response.data?.address;
+    const res = await apiClient.put<any>(`/addresses/${addressId}/set_default`);
+    return res.data?.address;
   },
 
   getDefaultShippingAddress: async (): Promise<Address | null> => {

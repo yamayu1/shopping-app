@@ -6,7 +6,7 @@ class Category < ApplicationRecord
 
   before_validation :generate_slug, if: -> { name.present? && slug.blank? }
 
-  scope :active, -> { where(active: true) }
+  scope :active, -> { where(is_active: true) }
 
   def generate_slug
     base_slug = name.parameterize

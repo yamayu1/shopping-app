@@ -30,22 +30,20 @@ export const productService = {
   },
 
   getProduct: async (id: number): Promise<Product> => {
-    const response = await apiClient.get<any>(`/products/${id}`);
-    return response.data?.product;
+    const res = await apiClient.get<any>(`/products/${id}`);
+    return res.data?.product;
   },
 
   getFeaturedProducts: async (limit: number = 8): Promise<Product[]> => {
-    const response = await apiClient.get<any>(
-      `/products/featured?limit=${limit}`
-    );
-    return response.data?.products || [];
+    const res = await apiClient.get<any>(`/products/featured?limit=${limit}`);
+    return res.data?.products || [];
   },
 
   getRelatedProducts: async (productId: number, limit: number = 4): Promise<Product[]> => {
-    const response = await apiClient.get<ApiResponse<Product[]>>(
+    const res = await apiClient.get<any>(
       `/products/${productId}/related?limit=${limit}`
     );
-    return response.data;
+    return res.data;
   },
 
   searchProducts: async (
@@ -71,13 +69,13 @@ export const productService = {
   },
 
   getCategories: async (): Promise<Category[]> => {
-    const response = await apiClient.get<any>('/categories');
-    return response.data?.categories || [];
+    const { data } = await apiClient.get<any>('/categories');
+    return data?.categories || [];
   },
 
   getCategory: async (id: number): Promise<Category> => {
-    const response = await apiClient.get<ApiResponse<Category>>(`/categories/${id}`);
-    return response.data;
+    const { data } = await apiClient.get<any>(`/categories/${id}`);
+    return data;
   },
 
   getProductsByCategory: async (

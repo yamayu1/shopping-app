@@ -30,8 +30,8 @@ class SampleDataSeeder extends Seeder
             DB::table('categories')->updateOrInsert(
                 ['slug' => $cat['slug']],
                 array_merge($cat, [
-                    'is_active' => 1,
                     'active' => 1,
+                    'is_active' => 1,
                     'sort_order' => 0,
                     'is_featured' => 0,
                     'created_at' => now(),

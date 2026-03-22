@@ -56,17 +56,17 @@ class Admin extends Authenticatable implements JWTSubject
 
     public function canManageProducts(): bool
     {
-        return in_array($this->role, ['super_admin', 'admin']);
+        return in_array($this->role, ['super_admin', 'admin', 'manager']);
     }
 
     public function canManageOrders(): bool
     {
-        return in_array($this->role, ['super_admin', 'admin']);
+        return in_array($this->role, ['super_admin', 'admin', 'manager']);
     }
 
     public function canManageUsers(): bool
     {
-        return $this->isSuperAdmin();
+        return in_array($this->role, ['super_admin', 'admin']);
     }
 
     public function scopeActive($query)
