@@ -33,6 +33,8 @@ const mockCart: Cart = {
   ],
   total_price: 2000,
   total_items: 2,
+  created_at: '2024-01-01T00:00:00Z',
+  updated_at: '2024-01-01T00:00:00Z',
 };
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
