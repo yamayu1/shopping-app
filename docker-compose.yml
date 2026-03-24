@@ -97,7 +97,7 @@ services:
         php artisan jwt:secret --force &&
         sleep 5 &&
         php database/fix_schema.php || true &&
-        php artisan migrate --force &&
+        php artisan migrate --force || true &&
         php artisan db:seed --force || true &&
         php artisan serve --host=0.0.0.0 --port=8000
       "

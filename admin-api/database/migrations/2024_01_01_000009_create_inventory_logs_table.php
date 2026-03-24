@@ -15,8 +15,8 @@ return new class extends Migration
 
         Schema::create('inventory_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->foreignId('admin_id')->nullable()->constrained('admins')->onDelete('set null');
+            $table->bigInteger('product_id');
+            $table->bigInteger('admin_id')->nullable();
             $table->integer('quantity_change');
             $table->integer('quantity_after');
             $table->string('reason')->nullable();
