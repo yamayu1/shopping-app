@@ -95,9 +95,9 @@ services:
         php artisan package:discover --ansi &&
         php artisan key:generate --force &&
         sleep 5 &&
-        php database/fix_schema.php 2>/dev/null || true &&
+        php database/fix_schema.php || true &&
         php artisan migrate --force &&
-        php artisan db:seed --force 2>/dev/null || true &&
+        php artisan db:seed --force || true &&
         php artisan serve --host=0.0.0.0 --port=8000
       "
 
