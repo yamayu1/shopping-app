@@ -12,6 +12,21 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // admins テーブルの不足カラムを追加
+        if (Schema::hasTable('admins')) {
+            Schema::table('admins', function (Blueprint $table) {
+                if (!Schema::hasColumn('admins', 'deleted_at')) {
+                    $table->softDeletes();
+                }
+                if (!Schema::hasColumn('admins', 'remember_token')) {
+                    $table->rememberToken();
+                }
+                if (!Schema::hasColumn('admins', 'email_verified_at')) {
+                    $table->timestamp('email_verified_at')->nullable()->after('email');
+                }
+            });
+        }
+
         // categories テーブルの不足カラムを追加
         if (Schema::hasTable('categories')) {
             Schema::table('categories', function (Blueprint $table) {
