@@ -65,8 +65,10 @@ class AuthController extends Controller
             return $this->respondWithToken($token, $admin);
 
         } catch (JWTException $e) {
-            return $this->errorResponse('Could not create token', null, 500);
+            \Log::error('JWT Login Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return $this->errorResponse('Could not create token', $e->getMessage(), 500);
         } catch (\Exception $e) {
+            \Log::error('Login Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return $this->errorResponse('Login failed', $e->getMessage(), 500);
         }
     }

@@ -29,7 +29,6 @@ class Admin extends Authenticatable implements JWTSubject
     protected $casts = [
         'last_login_at' => 'datetime',
         'is_active' => 'boolean',
-        'password' => 'hashed',
     ];
 
     // 管理者の役割
