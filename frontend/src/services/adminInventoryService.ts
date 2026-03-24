@@ -50,10 +50,10 @@ export const adminInventoryService = {
       params.append('search', filters.search);
     }
     if (filters?.low_stock_only) {
-      params.append('low_stock_only', 'true');
+      params.append('stock_status', 'low_stock');
     }
     if (filters?.out_of_stock_only) {
-      params.append('out_of_stock_only', 'true');
+      params.append('stock_status', 'out_of_stock');
     }
     if (filters?.category_id) {
       params.append('category_id', filters.category_id.toString());
@@ -79,7 +79,7 @@ export const adminInventoryService = {
   // 商品IDで在庫情報を取得
   getInventoryByProductId: async (productId: number): Promise<InventoryItem> => {
     const response = await adminApiClient.get<AdminApiResponse<InventoryItem>>(
-      `/admin/inventory/product/${productId}`
+      `/admin/inventory/products/${productId}/logs`
     );
     return response.data.data;
   },
@@ -87,8 +87,13 @@ export const adminInventoryService = {
   // 在庫数を更新
   updateStock: async (productId: number, updateData: StockUpdateData): Promise<InventoryItem> => {
     const response = await adminApiClient.put<AdminApiResponse<InventoryItem>>(
-      `/admin/inventory/product/${productId}`,
-      updateData
+      `/admin/inventory/products/${productId}/stock`,
+      {
+        operation: updateData.type,
+        quantity: updateData.quantity,
+        reason: updateData.notes || '在庫手動更新',
+        notes: updateData.notes,
+      }
     );
     return response.data.data;
   },
@@ -96,18 +101,26 @@ export const adminInventoryService = {
   // 在庫少アラートの閾値を設定
   setLowStockThreshold: async (productId: number, threshold: number): Promise<InventoryItem> => {
     const response = await adminApiClient.put<AdminApiResponse<InventoryItem>>(
-      `/admin/inventory/product/${productId}/threshold`,
-      { low_stock_threshold: threshold }
+      `/admin/inventory/products/${productId}/stock`,
+      {
+        operation: 'set',
+        quantity: threshold,
+        reason: '閾値設定',
+      }
     );
     return response.data.data;
   },
 
   // 在庫統計を取得
   getStatistics: async (): Promise<InventoryStatistics> => {
-    const response = await adminApiClient.get<AdminApiResponse<InventoryStatistics>>(
-      '/admin/inventory/statistics'
-    );
-    return response.data.data;
+    const response = await adminApiClient.get<any>('/admin/inventory/statistics');
+    const apiData = response.data.data || response.data;
+    return {
+      total_products: apiData.total_products || 0,
+      low_stock_products: apiData.low_stock_products || 0,
+      out_of_stock_products: apiData.out_of_stock_products || 0,
+      total_inventory_value: apiData.total_inventory_value || 0,
+    };
   },
 
   // 在庫情報をCSVにエクスポート
@@ -121,7 +134,7 @@ export const adminInventoryService = {
   // 在庫少アラートを取得
   getLowStockAlerts: async (): Promise<InventoryItem[]> => {
     const response = await adminApiClient.get<AdminApiResponse<InventoryItem[]>>(
-      '/admin/inventory/low-stock-alerts'
+      '/admin/inventory/low-stock'
     );
     return response.data.data;
   },
@@ -129,7 +142,7 @@ export const adminInventoryService = {
   // 商品の在庫変動履歴を取得
   getStockHistory: async (productId: number): Promise<any[]> => {
     const response = await adminApiClient.get<AdminApiResponse<any[]>>(
-      `/admin/inventory/product/${productId}/history`
+      `/admin/inventory/products/${productId}/logs`
     );
     return response.data.data;
   },

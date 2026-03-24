@@ -5,6 +5,8 @@ export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3
 export const STORAGE_KEYS = {
   AUTH_TOKEN: 'auth_token',
   USER_DATA: 'user_data',
+  ADMIN_AUTH_TOKEN: 'admin_auth_token',
+  ADMIN_USER_DATA: 'admin_user_data',
   CART_DATA: 'cart_data',
   THEME_MODE: 'theme_mode',
 };

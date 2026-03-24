@@ -16,6 +16,11 @@ services:
       - ./database/init:/docker-entrypoint-initdb.d
     networks:
       - shopping_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:7-alpine
@@ -39,11 +44,17 @@ services:
     ports:
       - "3001:3000"
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - shopping_network
-    command: ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "3000"]
+    command: >
+      sh -c "
+        bundle exec rails db:migrate 2>/dev/null || bundle exec rails db:migrate &&
+        bundle exec rails server -b 0.0.0.0 -p 3000
+      "
 
   laravel_admin:
     build:
@@ -60,18 +71,34 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       APP_ENV: local
-      APP_DEBUG: true
+      APP_DEBUG: "true"
     ports:
       - "8000:8000"
     volumes:
       - ./admin-api:/var/www/html
       - laravel_vendor:/var/www/html/vendor
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rails_api:
+        condition: service_started
     networks:
       - shopping_network
-    command: ["sh", "-c", "cp -n .env.example .env 2>/dev/null || true && mkdir -p bootstrap/cache && chmod -R 775 bootstrap/cache && composer install --no-scripts && php artisan package:discover --ansi && php artisan key:generate --force && php artisan serve --host=0.0.0.0 --port=8000"]
+    command: >
+      sh -c "
+        cp -n .env.example .env 2>/dev/null || true &&
+        mkdir -p bootstrap/cache storage/framework/{sessions,views,cache} &&
+        chmod -R 775 bootstrap/cache storage &&
+        composer install --no-scripts &&
+        php artisan package:discover --ansi &&
+        php artisan key:generate --force &&
+        sleep 5 &&
+        php artisan migrate --force &&
+        php artisan db:seed --force 2>/dev/null || true &&
+        php artisan serve --host=0.0.0.0 --port=8000
+      "
 
   frontend:
     build:

@@ -13,14 +13,9 @@ export const adminApiClient = axios.create({
 // リクエストインターセプター: トークンを自動的に追加
 adminApiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    const token = localStorage.getItem(STORAGE_KEYS.ADMIN_AUTH_TOKEN);
     if (token) {
-      try {
-        const parsedToken = JSON.parse(token);
-        config.headers.Authorization = `Bearer ${parsedToken}`;
-      } catch {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -84,9 +79,9 @@ export const adminAuthService = {
       if (response.data.success && response.data.data) {
         const { access_token, admin } = response.data.data;
 
-        // トークンと管理者データを保存
-        localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify(access_token));
-        localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(admin));
+        // トークンと管理者データを保存（管理者専用キー）
+        localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH_TOKEN, access_token);
+        localStorage.setItem(STORAGE_KEYS.ADMIN_USER_DATA, JSON.stringify(admin));
 
         return admin;
       } else {
@@ -130,14 +125,14 @@ export const adminAuthService = {
 
   // 管理者ログアウト
   logout: (): void => {
-    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+    localStorage.removeItem(STORAGE_KEYS.ADMIN_AUTH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.ADMIN_USER_DATA);
   },
 
   // 管理者認証状態確認
   isAuthenticated: (): boolean => {
-    const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
-    const userData = localStorage.getItem(STORAGE_KEYS.USER_DATA);
+    const token = localStorage.getItem(STORAGE_KEYS.ADMIN_AUTH_TOKEN);
+    const userData = localStorage.getItem(STORAGE_KEYS.ADMIN_USER_DATA);
     
     if (!token || !userData) return false;
     
@@ -152,7 +147,7 @@ export const adminAuthService = {
   // 保存された管理者データ取得
   getStoredAdmin: (): AdminUser | null => {
     try {
-      const userData = localStorage.getItem(STORAGE_KEYS.USER_DATA);
+      const userData = localStorage.getItem(STORAGE_KEYS.ADMIN_USER_DATA);
       if (!userData) return null;
       
       const user = JSON.parse(userData);

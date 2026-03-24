@@ -62,8 +62,9 @@ export const adminCategoryService = {
 
   // カテゴリをツリー構造（階層構造）で取得
   getCategoryTree: async (): Promise<Category[]> => {
-    const response = await adminApiClient.get<AdminApiResponse<Category[]>>('/admin/categories/tree');
-    return response.data.data;
+    const response = await adminApiClient.get<any>('/admin/categories?tree_view=true');
+    const apiData = response.data.data || response.data;
+    return apiData.categories || [];
   },
 
   // カテゴリをIDで取得
@@ -97,16 +98,15 @@ export const adminCategoryService = {
 
   // カテゴリの有効/無効を切り替え
   toggleActive: async (id: number, isActive: boolean): Promise<Category> => {
-    const response = await adminApiClient.patch<AdminApiResponse<Category>>(
-      `/admin/categories/${id}/toggle-active`,
-      { is_active: isActive }
+    const response = await adminApiClient.put<AdminApiResponse<Category>>(
+      `/admin/categories/${id}/toggle-status`
     );
     return response.data.data;
   },
 
   // カテゴリの並び順を変更
   reorderCategories: async (categoryOrders: Array<{ id: number; sort_order: number }>): Promise<void> => {
-    await adminApiClient.post('/admin/categories/reorder', { categories: categoryOrders });
+    await adminApiClient.put('/admin/categories/sort-order', { categories: categoryOrders });
   },
 
   // カテゴリ画像をアップロード
@@ -114,8 +114,8 @@ export const adminCategoryService = {
     const formData = new FormData();
     formData.append('image', imageFile);
 
-    const response = await adminApiClient.post<AdminApiResponse<Category>>(
-      `/admin/categories/${id}/image`,
+    const response = await adminApiClient.put<AdminApiResponse<Category>>(
+      `/admin/categories/${id}`,
       formData,
       {
         headers: {
@@ -126,10 +126,11 @@ export const adminCategoryService = {
     return response.data.data;
   },
 
-  // カテゴリを削除 image
+  // カテゴリ画像を削除
   deleteCategoryImage: async (id: number): Promise<Category> => {
-    const response = await adminApiClient.delete<AdminApiResponse<Category>>(
-      `/admin/categories/${id}/image`
+    const response = await adminApiClient.put<AdminApiResponse<Category>>(
+      `/admin/categories/${id}`,
+      { remove_image: true }
     );
     return response.data.data;
   },

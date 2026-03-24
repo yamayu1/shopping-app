@@ -4,14 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * 商品テーブル（Railsマイグレーションで作成済みの場合はスキップ）
+ */
 return new class extends Migration
 {
-    /**
-     * マイグレーションを実行する
-     */
     public function up(): void
     {
         if (Schema::hasTable('products')) return;
+
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -24,6 +25,7 @@ return new class extends Migration
             $table->integer('stock_quantity')->default(0);
             $table->integer('low_stock_threshold')->default(10);
             $table->foreignId('category_id')->constrained('categories');
+            $table->integer('status')->default(0);
             $table->string('brand')->nullable();
             $table->decimal('weight', 8, 2)->nullable();
             $table->json('dimensions')->nullable();
@@ -40,24 +42,18 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            // パフォーマンス向上のためのインデックス
             $table->index(['sku', 'is_active']);
             $table->index(['category_id', 'is_active']);
             $table->index(['is_active', 'is_featured']);
-            $table->index(['stock_quantity', 'low_stock_threshold']);
             $table->index('price');
             $table->index('is_active');
             $table->index('is_featured');
             $table->index('brand');
-            
-            // 全文検索インデックス
+
             $table->fullText(['name', 'description', 'short_description', 'sku']);
         });
     }
 
-    /**
-     * マイグレーションをロールバックする
-     */
     public function down(): void
     {
         Schema::dropIfExists('products');

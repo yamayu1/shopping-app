@@ -4,19 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * カテゴリテーブル（Railsマイグレーションで作成済みの場合はスキップ）
+ */
 return new class extends Migration
 {
-    /**
-     * マイグレーションを実行する
-     */
     public function up(): void
     {
         if (Schema::hasTable('categories')) return;
+
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
+            $table->boolean('active')->default(true);
             $table->foreignId('parent_id')->nullable()->constrained('categories')->onDelete('cascade');
             $table->string('image')->nullable();
             $table->string('icon')->nullable();
@@ -29,7 +31,6 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            // パフォーマンス向上のためのインデックス
             $table->index(['slug', 'is_active']);
             $table->index(['parent_id', 'sort_order']);
             $table->index('is_active');
@@ -38,9 +39,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * マイグレーションをロールバックする
-     */
     public function down(): void
     {
         Schema::dropIfExists('categories');

@@ -7,21 +7,22 @@ class Order < ApplicationRecord
   validates :total_amount, presence: true, numericality: { greater_than: 0 }
   validates :status, presence: true
 
-  enum status: { 
-    pending: 0, 
-    confirmed: 1, 
-    processing: 2, 
-    shipped: 3, 
-    delivered: 4, 
-    cancelled: 5,
-    refunded: 6
+  enum status: {
+    pending: 'pending',
+    confirmed: 'confirmed',
+    processing: 'processing',
+    shipped: 'shipped',
+    delivered: 'delivered',
+    cancelled: 'cancelled',
+    refunded: 'refunded'
   }
 
+  # payment_refundedに名前変更してstatusのrefundedとのメソッド名衝突を回避
   enum payment_status: {
-    unpaid: 0,
-    paid: 1,
-    failed: 2,
-    refunded: 3
+    unpaid: 'unpaid',
+    paid: 'paid',
+    payment_failed: 'failed',
+    payment_refunded: 'refunded'
   }
 
   before_validation :generate_order_number, on: :create

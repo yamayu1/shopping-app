@@ -37,33 +37,35 @@ clean:
 # プロジェクトのセットアップ（初回セットアップ）
 setup: build
 	docker-compose up -d mysql redis
-	sleep 10
-	docker-compose run --rm rails_api bundle install
-	docker-compose run --rm rails_api rails db:create db:migrate
-	docker-compose run --rm laravel_admin composer install
-	docker-compose run --rm laravel_admin php artisan migrate
-	docker-compose run --rm frontend npm install
-	$(MAKE) seed
+	@echo "MySQLの起動を待機中..."
+	@sleep 15
+	docker-compose run --rm rails_api bundle exec rails db:create 2>/dev/null || true
+	docker-compose run --rm rails_api bundle exec rails db:migrate
+	docker-compose run --rm rails_api bundle exec rails db:seed
+	docker-compose run --rm laravel_admin sh -c "cp -n .env.example .env 2>/dev/null || true && composer install --no-scripts && php artisan package:discover --ansi && php artisan key:generate --force"
+	docker-compose run --rm laravel_admin php artisan migrate --force
+	docker-compose run --rm laravel_admin php artisan db:seed --force
+	@echo "セットアップ完了！ 'make up' で起動してください"
 
-# データベースマイグレーションを実行
+# データベースマイグレーションを実行（Rails → Laravel の順序）
 migrate:
-	docker-compose run --rm rails_api rails db:migrate
-	docker-compose run --rm laravel_admin php artisan migrate
+	docker-compose run --rm rails_api bundle exec rails db:migrate
+	docker-compose run --rm laravel_admin php artisan migrate --force
 
 # サンプルデータでデータベースをシード
 seed:
-	docker-compose run --rm rails_api rails db:seed
-	docker-compose run --rm laravel_admin php artisan db:seed
+	docker-compose run --rm rails_api bundle exec rails db:seed
+	docker-compose run --rm laravel_admin php artisan db:seed --force
 
 # テストを実行
 test:
-	docker-compose run --rm rails_api rails test
+	docker-compose run --rm rails_api bundle exec rails test
 	docker-compose run --rm laravel_admin php artisan test
 	docker-compose run --rm frontend npm test -- --coverage --watchAll=false
 
 # 特定のテストスイートを実行
 test-rails:
-	docker-compose run --rm rails_api rails test
+	docker-compose run --rm rails_api bundle exec rails test
 
 test-laravel:
 	docker-compose run --rm laravel_admin php artisan test
@@ -86,5 +88,10 @@ install-deps:
 
 # APIドキュメントを生成
 docs:
-	docker-compose run --rm rails_api rails routes
+	docker-compose run --rm rails_api bundle exec rails routes
 	docker-compose run --rm laravel_admin php artisan route:list
+
+# データベースをリセット（全データ削除して再作成）
+db-reset:
+	docker-compose run --rm rails_api bundle exec rails db:drop db:create db:migrate db:seed
+	docker-compose run --rm laravel_admin php artisan migrate:fresh --seed --force

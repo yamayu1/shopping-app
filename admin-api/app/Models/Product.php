@@ -122,6 +122,46 @@ class Product extends Model
         });
     }
 
+    // 在庫が少ない商品
+    public function scopeLowStock(Builder $query): Builder
+    {
+        return $query->whereColumn('stock_quantity', '<=', 'low_stock_threshold')
+                     ->where('stock_quantity', '>', 0);
+    }
+
+    // 注目商品のみ
+    public function scopeFeatured(Builder $query): Builder
+    {
+        return $query->where('is_featured', true);
+    }
+
+    // 価格範囲でフィルター
+    public function scopePriceRange(Builder $query, $min, $max): Builder
+    {
+        return $query->whereBetween('price', [$min, $max]);
+    }
+
+    // 総販売数を取得
+    public function getTotalSales(): int
+    {
+        return $this->orderItems()->sum('quantity');
+    }
+
+    // 総売上を取得
+    public function getTotalRevenue(): float
+    {
+        return (float) $this->orderItems()->sum('total');
+    }
+
+    // 利益率を取得
+    public function getProfitMargin(): float
+    {
+        if (!$this->cost_price || $this->price <= 0) {
+            return 0;
+        }
+        return round((($this->price - $this->cost_price) / $this->price) * 100, 2);
+    }
+
     // 在庫を更新（同時アクセス対策あり）
     public function updateStock(int $quantity, string $operation = 'subtract', string $reason = ''): bool
     {

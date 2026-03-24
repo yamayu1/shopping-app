@@ -94,6 +94,8 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
         Route::put('/products/{productId}/stock', [InventoryController::class, 'updateStock']);
         Route::get('/products/{productId}/logs', [InventoryController::class, 'productLogs']);
         
+        Route::get('/statistics', [InventoryController::class, 'statistics']);
+
         // 一括操作
         Route::put('/bulk/stock', [InventoryController::class, 'bulkUpdateStock']);
     });

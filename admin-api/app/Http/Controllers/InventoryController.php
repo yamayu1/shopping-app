@@ -537,6 +537,33 @@ class InventoryController extends Controller
     }
 
     /**
+     * 在庫統計を取得
+     *
+     * @return JsonResponse
+     */
+    public function statistics(): JsonResponse
+    {
+        try {
+            $metrics = $this->getInventoryMetrics();
+
+            // 在庫評価額を算出
+            $totalRetailValue = Product::active()->get()->sum(function ($product) {
+                return $product->stock_quantity * $product->price;
+            });
+
+            return $this->successResponse('Inventory statistics retrieved successfully', [
+                'total_products' => $metrics['total_products'],
+                'low_stock_products' => $metrics['low_stock_products'],
+                'out_of_stock_products' => $metrics['out_of_stock_products'],
+                'total_inventory_value' => $totalRetailValue,
+                'metrics' => $metrics,
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse('Failed to retrieve inventory statistics', $e->getMessage(), 500);
+        }
+    }
+
+    /**
      * 在庫メトリクスを取得
      *
      * @return array
