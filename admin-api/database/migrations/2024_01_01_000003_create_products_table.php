@@ -38,7 +38,7 @@ return new class extends Migration
             $table->text('meta_description')->nullable();
             $table->json('tags')->nullable();
             $table->json('images')->nullable();
-            $table->json('attributes')->nullable();
+            $table->json('custom_attributes')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

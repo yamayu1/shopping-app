@@ -49,7 +49,7 @@ addColumnIfMissing($pdo, 'categories', 'is_active', 'BOOLEAN DEFAULT TRUE');
 addColumnIfMissing($pdo, 'categories', 'is_featured', 'BOOLEAN DEFAULT FALSE');
 addColumnIfMissing($pdo, 'categories', 'meta_title', 'VARCHAR(255) NULL');
 addColumnIfMissing($pdo, 'categories', 'meta_description', 'TEXT NULL');
-addColumnIfMissing($pdo, 'categories', 'attributes', 'JSON NULL');
+addColumnIfMissing($pdo, 'categories', 'custom_attributes', 'JSON NULL');
 addColumnIfMissing($pdo, 'categories', 'deleted_at', 'TIMESTAMP NULL');
 
 // products テーブル
@@ -69,7 +69,7 @@ addColumnIfMissing($pdo, 'products', 'meta_title', 'VARCHAR(255) NULL');
 addColumnIfMissing($pdo, 'products', 'meta_description', 'TEXT NULL');
 addColumnIfMissing($pdo, 'products', 'tags', 'JSON NULL');
 addColumnIfMissing($pdo, 'products', 'images', 'JSON NULL');
-addColumnIfMissing($pdo, 'products', 'attributes', 'JSON NULL');
+addColumnIfMissing($pdo, 'products', 'custom_attributes', 'JSON NULL');
 addColumnIfMissing($pdo, 'products', 'deleted_at', 'TIMESTAMP NULL');
 
 // users テーブル

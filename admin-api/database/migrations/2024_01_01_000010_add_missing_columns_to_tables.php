@@ -54,8 +54,8 @@ return new class extends Migration
                 if (!Schema::hasColumn('categories', 'meta_description')) {
                     $table->text('meta_description')->nullable()->after('meta_title');
                 }
-                if (!Schema::hasColumn('categories', 'attributes')) {
-                    $table->json('attributes')->nullable()->after('meta_description');
+                if (!Schema::hasColumn('categories', 'custom_attributes')) {
+                    $table->json('custom_attributes')->nullable()->after('meta_description');
                 }
                 if (!Schema::hasColumn('categories', 'deleted_at')) {
                     $table->softDeletes();
@@ -114,8 +114,8 @@ return new class extends Migration
                 if (!Schema::hasColumn('products', 'images')) {
                     $table->json('images')->nullable()->after('tags');
                 }
-                if (!Schema::hasColumn('products', 'attributes')) {
-                    $table->json('attributes')->nullable()->after('images');
+                if (!Schema::hasColumn('products', 'custom_attributes')) {
+                    $table->json('custom_attributes')->nullable()->after('images');
                 }
                 if (!Schema::hasColumn('products', 'deleted_at')) {
                     $table->softDeletes();

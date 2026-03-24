@@ -27,7 +27,7 @@ class CreateProducts < ActiveRecord::Migration[7.0]
       t.text :meta_description
       t.json :tags
       t.json :images
-      t.json :attributes
+      t.json :custom_attributes
 
       t.timestamp :deleted_at
       t.timestamps

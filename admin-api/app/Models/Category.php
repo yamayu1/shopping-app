@@ -23,14 +23,14 @@ class Category extends Model
         'is_featured',
         'meta_title',
         'meta_description',
-        'attributes',
+        'custom_attributes',
     ];
 
     protected $casts = [
         'sort_order' => 'integer',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
-        'attributes' => 'array',
+        'custom_attributes' => 'array',
     ];
 
     // リレーション

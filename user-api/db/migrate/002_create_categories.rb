@@ -16,7 +16,7 @@ class CreateCategories < ActiveRecord::Migration[7.0]
       t.boolean :is_featured, default: false
       t.string :meta_title
       t.text :meta_description
-      t.json :attributes
+      t.json :custom_attributes
 
       t.timestamp :deleted_at
       t.timestamps

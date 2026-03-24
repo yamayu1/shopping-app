@@ -31,7 +31,7 @@ class Product extends Model
         'is_featured',
         'tags',
         'images',
-        'attributes',
+        'custom_attributes',
     ];
 
     protected $casts = [
@@ -43,7 +43,7 @@ class Product extends Model
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
         'images' => 'json',
-        'attributes' => 'json',
+        'custom_attributes' => 'json',
         'tags' => 'json',
     ];
 

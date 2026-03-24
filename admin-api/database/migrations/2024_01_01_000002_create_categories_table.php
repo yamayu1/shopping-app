@@ -27,7 +27,7 @@ return new class extends Migration
             $table->boolean('is_featured')->default(false);
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
-            $table->json('attributes')->nullable();
+            $table->json('custom_attributes')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

@@ -131,7 +131,7 @@ class ProductController extends Controller
                 'tags' => 'nullable|array',
                 'images' => 'nullable|array|max:10',
                 'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-                'attributes' => 'nullable|json',
+                'custom_attributes' => 'nullable|json',
             ]);
 
             if ($validator->fails()) {
@@ -259,7 +259,7 @@ class ProductController extends Controller
                 'new_images' => 'nullable|array|max:10',
                 'new_images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 'remove_images' => 'nullable|array',
-                'attributes' => 'nullable|json',
+                'custom_attributes' => 'nullable|json',
             ]);
 
             if ($validator->fails()) {

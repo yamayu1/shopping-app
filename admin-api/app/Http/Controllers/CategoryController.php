@@ -110,7 +110,7 @@ class CategoryController extends Controller
                 'is_featured' => 'boolean',
                 'meta_title' => 'nullable|string|max:255',
                 'meta_description' => 'nullable|string|max:500',
-                'attributes' => 'nullable|json',
+                'custom_attributes' => 'nullable|json',
             ]);
 
             if ($validator->fails()) {
@@ -242,7 +242,7 @@ class CategoryController extends Controller
                 'is_featured' => 'boolean',
                 'meta_title' => 'nullable|string|max:255',
                 'meta_description' => 'nullable|string|max:500',
-                'attributes' => 'nullable|json',
+                'custom_attributes' => 'nullable|json',
                 'remove_image' => 'boolean',
                 'remove_icon' => 'boolean',
             ]);
