@@ -46,6 +46,7 @@ const ProductsPage: React.FC = () => {
   });
 
   const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
+  const [priceRangeLoaded, setPriceRangeLoaded] = useState(false);
 
   useEffect(() => {
     loadCategories();
@@ -86,12 +87,13 @@ const ProductsPage: React.FC = () => {
       setProducts(response.data || []);
       setTotalPages(response.pagination?.total_pages || 1);
 
-      if (response.data && response.data.length > 0) {
+      if (response.data && response.data.length > 0 && !priceRangeLoaded) {
         const prices = response.data.map(p => p.price);
         setPriceRange({
           min: Math.min(...prices),
           max: Math.max(...prices),
         });
+        setPriceRangeLoaded(true);
       }
     } catch (err: any) {
       console.error('商品の読み込みエラー:', err);
@@ -127,6 +129,7 @@ const ProductsPage: React.FC = () => {
     });
     setSearchQuery('');
     setCurrentPage(1);
+    setPriceRangeLoaded(false);
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
