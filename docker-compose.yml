@@ -94,6 +94,7 @@ services:
         composer install --no-scripts &&
         php artisan package:discover --ansi &&
         php artisan key:generate --force &&
+        php artisan jwt:secret --force &&
         sleep 5 &&
         php database/fix_schema.php || true &&
         php artisan migrate --force &&
