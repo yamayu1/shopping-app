@@ -2,12 +2,9 @@
 
 require 'mysql2'
 require 'csv'
-require 'logger'
 require 'time'
 
-# ログの設定
-logger = Logger.new('/app/exports/scheduler.log')
-logger.info "Starting inventory export at #{Time.now}"
+puts "在庫エクスポート開始: #{Time.now}"
 
 # データベース設定
 DB_CONFIG = {
@@ -16,16 +13,16 @@ DB_CONFIG = {
   username: ENV.fetch('DB_USERNAME', 'shopping_user'),
   password: ENV.fetch('DB_PASSWORD', 'shopping_password'),
   database: ENV.fetch('DB_DATABASE', 'shopping_development')
-}.freeze
+}
 
 begin
   # データベースに接続
   client = Mysql2::Client.new(DB_CONFIG)
-  logger.info "Connected to database successfully"
+  puts "データベース接続OK"
 
   # カテゴリ情報付きの在庫データ取得クエリ
   query = <<~SQL
-    SELECT 
+    SELECT
       p.id,
       p.name as product_name,
       p.sku,
@@ -35,7 +32,7 @@ begin
       c.name as category_name,
       p.created_at,
       p.updated_at,
-      CASE 
+      CASE
         WHEN p.stock_quantity = 0 THEN '在庫切れ'
         WHEN p.stock_quantity < 10 THEN '在庫少'
         WHEN p.stock_quantity < 50 THEN '在庫中'
@@ -49,7 +46,7 @@ begin
   SQL
 
   results = client.query(query)
-  logger.info "Retrieved #{results.count} products from database"
+  puts "#{results.count}件の商品を取得"
 
   # タイムスタンプ付きCSVファイル名を生成
   timestamp = Time.now.strftime('%Y%m%d_%H%M%S')
@@ -82,7 +79,6 @@ begin
       inventory_value = row['inventory_value'].to_f
       total_inventory_value += inventory_value
 
-      # サマリー用に在庫レベルを集計
       case stock_status
       when '在庫少'
         low_stock_count += 1
@@ -102,10 +98,10 @@ begin
         row['product_name'],
         row['sku'],
         row['category_name'],
-        "¥#{row['price'].to_f.to_i.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse}",
+        row['price'].to_f.to_i,
         row['stock_quantity'],
         stock_status,
-        "¥#{inventory_value.to_i.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse}",
+        inventory_value.to_i,
         status_text,
         row['created_at'],
         row['updated_at']
@@ -118,38 +114,20 @@ begin
     csv << ['商品総数', results.count]
     csv << ['在庫切れ商品数', out_of_stock_count]
     csv << ['在庫少商品数', low_stock_count]
-    csv << ['在庫総額', "¥#{total_inventory_value.to_i.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse}"]
+    csv << ['在庫総額', total_inventory_value.to_i]
     csv << ['レポート生成日時', Time.now.strftime('%Y-%m-%d %H:%M:%S')]
   end
 
-  logger.info "Successfully exported inventory to #{csv_filename}"
-  logger.info "Total inventory value: ¥#{total_inventory_value.to_i}"
-  logger.info "Products out of stock: #{out_of_stock_count}"
-  logger.info "Products with low stock: #{low_stock_count}"
-
-  # 簡単にアクセスできるようlatest.csvのシンボリックリンクも作成
-  latest_filename = "/app/exports/inventory_latest.csv"
-  File.delete(latest_filename) if File.exist?(latest_filename)
-  File.symlink(File.basename(csv_filename), latest_filename)
-
-  # 古いファイルを削除（直近30日分のみ保持）
-  cleanup_date = Time.now - (30 * 24 * 60 * 60) # 30 days ago
-  Dir.glob('/app/exports/inventory_report_*.csv').each do |file|
-    file_time = File.mtime(file)
-    if file_time < cleanup_date
-      File.delete(file)
-      logger.info "Deleted old export file: #{file}"
-    end
-  end
+  puts "CSVファイルを出力しました: #{csv_filename}"
+  puts "在庫切れ: #{out_of_stock_count}件 / 在庫少: #{low_stock_count}件"
 
 rescue Mysql2::Error => e
-  logger.error "Database error: #{e.message}"
+  puts "データベースエラー: #{e.message}"
   exit 1
-rescue StandardError => e
-  logger.error "Unexpected error: #{e.message}"
-  logger.error e.backtrace.join("\n")
+rescue => e
+  puts "エラーが発生しました: #{e.message}"
   exit 1
 ensure
   client&.close
-  logger.info "Inventory export completed at #{Time.now}"
+  puts "在庫エクスポート完了: #{Time.now}"
 end

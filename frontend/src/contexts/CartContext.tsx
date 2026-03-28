@@ -28,6 +28,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setIsLoading(true);
       const data = await cartService.getCart();
+      // console.log('カート取得:', data);
       setCart(data);
     } catch (err) {
       setCart(null);

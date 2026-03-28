@@ -40,6 +40,7 @@ const OrdersPage: React.FC = () => {
 
       const filters = filterStatus !== 'all' ? { status: filterStatus } : undefined;
       const response = await orderService.getOrders(filters);
+      console.log('注文一覧:', response);
       setOrders(response.data);
     } catch (err: any) {
       console.error('注文の取得エラー:', err);

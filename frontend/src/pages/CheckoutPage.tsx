@@ -135,7 +135,8 @@ const CheckoutPage: React.FC = () => {
         payment_method: paymentMethod,
       };
 
-      await orderService.createOrder(orderData);
+      const result = await orderService.createOrder(orderData);
+      console.log('注文結果:', result);
       navigate(ROUTES.ORDERS);
     } catch (err: any) {
       setError('注文の処理に失敗しました。もう一度お試しください。');
@@ -482,7 +483,7 @@ const CheckoutPage: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 3, position: 'sticky', top: 80 }}>
+            <Paper sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
                 注文サマリー
               </Typography>

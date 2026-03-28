@@ -2,8 +2,9 @@ class AuthenticationController < ApplicationController
   skip_before_action :authenticate_user!, only: [:login, :register, :forgot_password, :reset_password]
 
   def login
+    # メールアドレスでユーザーを検索
     user = User.active.find_by(email: params[:email]&.downcase)
-    
+
     if user&.authenticate(params[:password])
       token = generate_jwt_token(user)
       
@@ -61,7 +62,7 @@ class AuthenticationController < ApplicationController
       # UserMailer.password_reset(user).deliver_now
     end
 
-    # always return success to prevent email enumeration attacks
+    # メールアドレスが存在しなくても同じレスポンスを返す
     render_success({}, 'If the email exists, a password reset link has been sent')
   end
 
@@ -88,5 +89,18 @@ class AuthenticationController < ApplicationController
 
   def user_params
     params.permit(:email, :password, :password_confirmation, :first_name, :last_name, :phone, :birth_date)
+  end
+
+  def user_data(user)
+    {
+      id: user.id,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      full_name: user.full_name,
+      phone: user.phone,
+      birth_date: user.birth_date,
+      created_at: user.created_at
+    }
   end
 end

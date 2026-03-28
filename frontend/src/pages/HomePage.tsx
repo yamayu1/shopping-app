@@ -46,6 +46,7 @@ const HomePage: React.FC = () => {
       setError(null);
 
       const products = await productService.getFeaturedProducts(8);
+      console.log('おすすめ商品:', products);
       setFeaturedProducts(products);
     } catch (err: any) {
       console.error('おすすめ商品の読み込み失敗:', err);

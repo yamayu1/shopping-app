@@ -71,6 +71,15 @@ class ProductsController < ApplicationController
 
   private
 
+  def pagination_data(collection)
+    {
+      current_page: collection.current_page,
+      total_pages: collection.total_pages,
+      total: collection.total_count,
+      per_page: collection.limit_value
+    }
+  end
+
   def product_data(product, detailed: false)
     data = {
       id: product.id,

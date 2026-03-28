@@ -19,6 +19,7 @@ const splitName = (name?: string) => {
   };
 };
 
+// APIのレスポンスをAuthUserの形に変換する
 const toAuthUser = (apiResponse: any): AuthUser => {
   const apiData = apiResponse.data?.user;
   const token = apiResponse.data?.token;

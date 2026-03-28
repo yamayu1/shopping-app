@@ -55,28 +55,6 @@ class ApplicationController < ActionController::API
     render json: { success: false, message: message, errors: errors }, status: status
   end
 
-  def user_data(user)
-    {
-      id: user.id,
-      email: user.email,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      full_name: user.full_name,
-      phone: user.phone,
-      birth_date: user.birth_date,
-      created_at: user.created_at
-    }
-  end
-
-  def pagination_data(collection)
-    {
-      current_page: collection.current_page,
-      total_pages: collection.total_pages,
-      total: collection.total_count,
-      per_page: collection.limit_value
-    }
-  end
-
   def health_check
     render json: { status: 'ok' }
   end

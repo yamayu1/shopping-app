@@ -1,5 +1,3 @@
-.PHONY: build up down restart logs clean test setup migrate seed
-
 # 全コンテナをビルド
 build:
 	docker-compose build

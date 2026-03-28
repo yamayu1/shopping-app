@@ -82,6 +82,7 @@ const ProductsPage: React.FC = () => {
         12
       );
 
+      console.log('商品一覧取得:', response.data?.length, '件');
       setProducts(response.data || []);
       setTotalPages(response.pagination?.total_pages || 1);
 

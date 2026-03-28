@@ -88,6 +88,7 @@ export const isValidImageFile = (file: File): boolean => {
 };
 
 // エラーメッセージの取得
+// いろんなパターンがあるので場合分けしてる
 export const getErrorMessage = (error: any): string => {
   if (typeof error === 'string') return error;
 
@@ -96,7 +97,7 @@ export const getErrorMessage = (error: any): string => {
     return error.response.data.message;
   }
 
-  // バリデーションエラー
+  // バリデーションエラー（配列で返ってくることがある）
   if (error?.response?.data?.errors) {
     let errors = error.response.data.errors;
     let firstError = Object.values(errors)[0];
