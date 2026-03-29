@@ -81,7 +81,7 @@ describe('cartService', () => {
     it('adds an item to the cart', async () => {
       mockedApiClient.post.mockResolvedValue({ data: { cart: mockCart } });
 
-      const result = await cartService.addItem({ product_id: 10, quantity: 2 });
+      const result = await cartService.addItem(10, 2);
 
       expect(mockedApiClient.post).toHaveBeenCalledWith('/cart/items', {
         product_id: 10,

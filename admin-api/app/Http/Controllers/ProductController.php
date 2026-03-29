@@ -24,6 +24,7 @@ class ProductController extends Controller
         try {
             $query = Product::with(['category:id,name,slug']);
 
+            // フィルター条件
             if ($request->has('category_id')) {
                 $query->byCategory($request->category_id);
             }
@@ -87,7 +88,7 @@ class ProductController extends Controller
         }
     }
 
-    // TODO: バリデーションもう少し厳しくしたい
+    // 商品登録。バリデーションもう少し厳しくしたいけど一旦これで
     public function store(Request $request): JsonResponse
     {
         try {
@@ -159,7 +160,7 @@ class ProductController extends Controller
             } catch (\Exception $e) {
                 DB::rollBack();
                 
-                // 失敗時にアップロード画像をクリーンアップ
+                // 失敗したらアップした画像を消す
                 foreach ($imagePaths as $path) {
                     Storage::disk('public')->delete($path);
                 }
@@ -292,6 +293,7 @@ class ProductController extends Controller
         }
     }
 
+    // 商品を削除。注文に紐づいてる商品は消せないようにしてる
     public function destroy(int $id): JsonResponse
     {
         try {

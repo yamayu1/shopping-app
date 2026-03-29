@@ -18,6 +18,7 @@ class AuthController extends Controller
         $this->middleware('auth:admin', ['except' => ['login', 'register']]);
     }
 
+    // ログイン処理
     public function login(Request $request): JsonResponse
     {
         try {
@@ -38,6 +39,7 @@ class AuthController extends Controller
                 return $this->errorResponse('Invalid credentials', null, 401);
             }
 
+            // 無効化されたアカウントはログインさせない
             if (!$admin->is_active) {
                 return $this->errorResponse('Account is deactivated', null, 403);
             }

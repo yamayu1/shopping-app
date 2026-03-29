@@ -75,7 +75,7 @@ const ProductDetailPage: React.FC = () => {
 
     try {
       setAddingToCart(true);
-      await cartService.addItem({ product_id: product.id, quantity });
+      await cartService.addItem(product.id, quantity);
       setError(null);
       // 成功メッセージを表示
       alert('カートに追加しました');

@@ -44,7 +44,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const addToCart = async (productId: number, quantity: number) => {
     try {
       setIsLoading(true);
-      const data = await cartService.addItem({ product_id: productId, quantity });
+      const data = await cartService.addItem(productId, quantity);
       setCart(data);
     } catch (err) {
       setError(getErrorMessage(err));

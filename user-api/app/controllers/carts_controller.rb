@@ -5,6 +5,7 @@ class CartsController < ApplicationController
     })
   end
 
+  # カートに商品を追加
   def add_item
     product = Product.find(params[:product_id])
     quantity = params[:quantity].to_i

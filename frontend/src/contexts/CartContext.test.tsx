@@ -103,10 +103,7 @@ describe('CartContext', () => {
       await result.current.addToCart(20, 1);
     });
 
-    expect(cartService.addItem).toHaveBeenCalledWith({
-      product_id: 20,
-      quantity: 1,
-    });
+    expect(cartService.addItem).toHaveBeenCalledWith(20, 1);
     expect(result.current.cart).toEqual(updatedCart);
   });
 

@@ -65,7 +65,7 @@ const HomePage: React.FC = () => {
 
     try {
       setAddToCartLoading(product.id);
-      await cartService.addItem({ product_id: product.id, quantity: 1 });
+      await cartService.addItem(product.id, 1);
     } catch (err: any) {
       console.error('カートへの追加失敗:', err);
       setError('カートへの追加に失敗しました');

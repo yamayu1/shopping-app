@@ -6,7 +6,7 @@ Amazon風のECサイトです。
 ## 使っている技術
 
 - React（TypeScript）
-- Ruby on Rails（Sinatra）
+- Ruby on Rails
 - Laravel（PHP）
 - MySQL 8.0
 - Redis

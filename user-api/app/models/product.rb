@@ -24,13 +24,15 @@ class Product < ApplicationRecord
     in_stock? && stock_quantity >= quantity
   end
 
+  # 在庫を減らす。同時購入でも在庫がマイナスにならないようにwith_lockを使っている
+  # ここの実装にかなり時間かかった
   def reduce_stock(quantity)
     return false unless can_purchase?(quantity)
-    
+
     with_lock do
       reload
       return false unless can_purchase?(quantity)
-      
+
       update(stock_quantity: stock_quantity - quantity)
     end
   end
