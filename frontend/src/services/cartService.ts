@@ -34,7 +34,7 @@ export const cartService = {
     await apiClient.delete<any>('/cart');
   },
 
-  // カートの合計金額を計算（フロント側で計算してる）
+  // カートの合計金額を計算
   calculateTotal: (cart: Cart): number => {
     if (!cart.items || cart.items.length === 0) return 0;
     let total = 0;

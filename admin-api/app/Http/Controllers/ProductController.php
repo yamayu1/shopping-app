@@ -88,7 +88,7 @@ class ProductController extends Controller
         }
     }
 
-    // 商品登録。バリデーションもう少し厳しくしたいけど一旦これで
+    // 商品登録。バリデーションは今後もう少し厳密にする予定
     public function store(Request $request): JsonResponse
     {
         try {
@@ -160,7 +160,7 @@ class ProductController extends Controller
             } catch (\Exception $e) {
                 DB::rollBack();
                 
-                // 失敗したらアップした画像を消す
+                // 失敗時にアップロード済み画像を削除
                 foreach ($imagePaths as $path) {
                     Storage::disk('public')->delete($path);
                 }
@@ -293,7 +293,7 @@ class ProductController extends Controller
         }
     }
 
-    // 商品を削除。注文に紐づいてる商品は消せないようにしてる
+    // 商品を削除。注文に紐づいている商品は削除不可
     public function destroy(int $id): JsonResponse
     {
         try {

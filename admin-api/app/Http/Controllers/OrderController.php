@@ -17,7 +17,7 @@ class OrderController extends Controller
         $this->middleware('check.permission:manage_orders');
     }
 
-    // 注文一覧。ステータスや期間で絞り込みできる
+    // 注文一覧。ステータスや期間で絞り込み可能
     public function index(Request $request): JsonResponse
     {
         try {

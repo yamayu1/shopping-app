@@ -5,7 +5,7 @@ class ProductsController < ApplicationController
   def index
     @products = Product.active.includes(:category, images_attachments: :blob)
 
-    # カテゴリとか検索条件があれば絞り込む
+    # カテゴリや検索条件があれば絞り込む
     @products = @products.by_category(params[:category_id]) if params[:category_id].present?
     @products = @products.search_by_name(params[:search]) if params[:search].present?
     @products = @products.in_stock if params[:in_stock] == 'true'

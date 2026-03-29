@@ -19,8 +19,7 @@ export const orderService = {
     return response.data?.order;
   },
 
-  // 注文一覧を取得。フィルターはURLSearchParamsで組み立ててる
-  // productServiceではbuildQueryStringを使ってるけど、こっちは手動でやってしまった
+  // 注文一覧を取得。フィルターはURLSearchParamsで組み立てている
   getOrders: async (filters?: OrderFilters): Promise<PaginatedResponse<Order>> => {
     const params = new URLSearchParams();
 

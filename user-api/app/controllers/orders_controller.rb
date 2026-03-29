@@ -20,7 +20,7 @@ class OrdersController < ApplicationController
     })
   end
 
-  # 注文作成。在庫チェック→在庫減らす→注文作成をトランザクションで囲んでる
+  # 注文作成。在庫チェック→在庫減算→注文作成をトランザクションで実行
   def create
     address = current_user.addresses.find(params[:address_id])
 
