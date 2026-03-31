@@ -3,7 +3,7 @@ import { STORAGE_KEYS } from '../utils/constants';
 
 // 管理者認証用の専用APIクライアント
 export const adminApiClient = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: process.env.REACT_APP_ADMIN_API_URL ? `${process.env.REACT_APP_ADMIN_API_URL}/api` : 'http://localhost:8000/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

@@ -142,7 +142,7 @@ erDiagram
 
 ## 補足
 
-- usersテーブルにはRails用のカラム（password_digest等）とLaravel用のカラム（password等）が両方存在する。RailsとLaravelで同一のDBを参照しているため、このような構成になっている
-- ordersのstatusは文字列で管理している（pending, confirmed, shipped等）。integerでの管理も検討したが、可読性を優先して文字列を採用した
-- deleted_atカラムがあるテーブルは論理削除を使用している。注文履歴の保持が必要なため、ユーザーや商品は物理削除しない方針とした
-- emailやSKUなど検索頻度の高いカラムにはインデックスを付与している
+- usersテーブルにはRails用の `password_digest` とLaravel用の `password` カラムが両方ある。RailsとLaravelで同じDBを見ているのでこうなってしまった。正直あまりきれいではないが、フレームワークごとにパスワードのハッシュ形式が違うので仕方なかった
+- ordersの `status` は最初integerで管理していたが、コードを読むときに「status = 2って何だっけ？」といちいち定義を見に行くのが面倒だったので、文字列（pending, confirmed, shipped等）に変えた
+- ユーザーや商品は物理削除（DELETE）ではなく、`deleted_at` に日時を入れる論理削除にした。物理削除すると注文履歴から「誰が何を買ったか」が分からなくなってしまうため
+- emailやSKUなど、WHERE句で検索することが多いカラムにはインデックスを付けた。付けないと全件スキャンになるので、データが増えたときに遅くなるのを防ぐため
