@@ -111,6 +111,7 @@ export const adminProductService = {
   },
 
   // 商品画像をアップロード
+  // ※FormDataを送る時はContent-Typeを自分で指定しない。axiosが自動でmultipart/form-dataにしてくれる
   uploadProductImage: async (id: number, imageFile: File, isPrimary: boolean = false): Promise<Product> => {
     const formData = new FormData();
     formData.append('image', imageFile);
@@ -118,12 +119,7 @@ export const adminProductService = {
 
     const response = await adminApiClient.post<AdminApiResponse<Product>>(
       `/admin/products/${id}/images`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+      formData
     );
     return response.data.data;
   },

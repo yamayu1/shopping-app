@@ -5,9 +5,6 @@ import { STORAGE_KEYS } from '../utils/constants';
 export const adminApiClient = axios.create({
   baseURL: process.env.REACT_APP_ADMIN_API_URL ? `${process.env.REACT_APP_ADMIN_API_URL}/api` : 'http://localhost:8000/api',
   timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // リクエストインターセプター: トークンを自動的に追加
