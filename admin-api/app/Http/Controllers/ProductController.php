@@ -432,11 +432,17 @@ class ProductController extends Controller
             $product = Product::findOrFail($id);
 
             $validator = Validator::make($request->all(), [
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'image' => 'required|file|mimes:jpeg,png,jpg,gif,webp|max:5120',
             ]);
 
             if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
+                return $this->errorResponse('Validation failed', [
+                    'errors' => $validator->errors(),
+                    'has_file' => $request->hasFile('image'),
+                    'content_type' => $request->header('Content-Type'),
+                    'all_keys' => array_keys($request->all()),
+                    'file_keys' => array_keys($request->allFiles()),
+                ], 422);
             }
 
             $image = $request->file('image');
