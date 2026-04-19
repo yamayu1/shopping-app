@@ -61,3 +61,5 @@ admin-api/public/storage/
 admin-api/public/storage
 user-api/Gemfile.lock
 user-api/db/schema.rb
+nginx/certs/*.key
+nginx/certs/*.crt
