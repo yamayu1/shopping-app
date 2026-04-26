@@ -2,33 +2,35 @@ class AuthenticationController < ApplicationController
   skip_before_action :authenticate_user!, only: [:login, :register, :forgot_password, :reset_password]
 
   def login
-    # メールアドレスでユーザーを検索
-    user = User.active.find_by(email: params[:email]&.downcase)
+    #ログイン
+    result = LoginUseCase.new(
+      email: params[:email],
+      password: params[:password]
+    ).call
 
-    if user&.authenticate(params[:password])
-      token = generate_jwt_token(user)
-      
+    if result[:success]
+      token = generate_jwt_token(result[:user])
       render_success({
-        user: user_data(user),
+        user: user_data(result[:user]),
         token: token
       }, 'ログインしました')
     else
-      render_error('メールアドレスまたはパスワードが正しくありません', :unauthorized)
+      render_error(result[:error], :unauthorized)
     end
   end
 
   def register
-    user = User.new(user_params)
-    
-    if user.save
-      token = generate_jwt_token(user)
-      
+    #登録
+    result = RegisterUserUseCase.new(user_params: user_params).call
+
+    if result[:success]
+      token = generate_jwt_token(result[:user])
       render_success({
-        user: user_data(user),
+        user: user_data(result[:user]),
         token: token
       }, '会員登録が完了しました', :created)
     else
-      render_error('会員登録に失敗しました', :unprocessable_entity, user.errors.full_messages)
+      render_error('会員登録に失敗しました', :unprocessable_entity, result[:errors])
     end
   end
 
