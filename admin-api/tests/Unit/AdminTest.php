@@ -23,8 +23,8 @@ class AdminTest extends TestCase
 
     public function test_it_identifies_super_admin(): void
     {
-        $superAdmin = Admin::factory()->superAdmin()->create();
-        $admin = Admin::factory()->create(['role' => 'admin']);
+        $superAdmin = Admin::factory()->superAdmin()->make();
+        $admin = Admin::factory()->make(['role' => 'admin']);
 
         $this->assertTrue($superAdmin->isSuperAdmin());
         $this->assertFalse($admin->isSuperAdmin());
@@ -33,7 +33,7 @@ class AdminTest extends TestCase
     /** @test */
     public function super_admin_can_manage_products(): void
     {
-        $admin = Admin::factory()->superAdmin()->create();
+        $admin = Admin::factory()->superAdmin()->make();
         $this->assertTrue($admin->canManageProducts());
     }
 
