@@ -20,7 +20,17 @@ class User < ApplicationRecord
   end
 
   def soft_delete
-    update(deleted_at: Time.current)
+    ActiveRecord::Base.transaction do
+      deleted_email = "deleted_#{id}_#{Time.current.to_i}_#{email}"
+      
+      cart&.destroy
+      addresses.destroy_all
+
+      update!(
+        email: deleted_email,
+        deleted_at: Time.current
+      )
+    end
   end
 
   def active?
