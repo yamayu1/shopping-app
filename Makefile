@@ -41,6 +41,7 @@ setup: build
 	docker-compose run --rm rails_api bundle exec rails db:migrate
 	docker-compose run --rm rails_api bundle exec rails db:seed
 	docker-compose run --rm laravel_admin sh -c "cp -n .env.example .env 2>/dev/null || true && mkdir -p bootstrap/cache storage/framework/sessions storage/framework/views storage/framework/cache storage/app/public/products storage/logs && chmod -R 775 bootstrap/cache storage && composer install --no-scripts && php artisan package:discover --ansi && php artisan key:generate --force"
+	docker-compose run --rm laravel_admin php artisan migrate --force
 	docker-compose run --rm laravel_admin php artisan db:seed --force
 	@echo "セットアップ完了！ 'make up' で起動してください"
 
