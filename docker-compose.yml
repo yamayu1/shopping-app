@@ -118,6 +118,7 @@ services:
       - /app/node_modules
     networks:
       - shopping_network
+    command: sh -c "npm install && npm start"
 
   scheduler:
     build:
