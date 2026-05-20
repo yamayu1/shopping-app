@@ -86,6 +86,17 @@ jobs:
           extensions: mbstring, pdo, pdo_mysql, bcmath
           tools: composer
 
+      - name: Laravel 用のディレクトリを作成
+        working-directory: ./admin-api
+        run: |
+          mkdir -p bootstrap/cache
+          mkdir -p storage/framework/sessions
+          mkdir -p storage/framework/views
+          mkdir -p storage/framework/cache
+          mkdir -p storage/app/public/products
+          mkdir -p storage/logs
+          chmod -R 775 bootstrap/cache storage
+
       - name: Composer 依存関係をインストール
         working-directory: ./admin-api
         run: composer install --prefer-dist --no-progress
