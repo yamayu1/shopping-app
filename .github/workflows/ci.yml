@@ -1,0 +1,134 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # ===== Railsのテスト =====
+  test-rails:
+    name: Rails Test
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: shopping_test
+          MYSQL_USER: shopping_user
+          MYSQL_PASSWORD: shopping_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -prootpassword"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: コードを取得
+        uses: actions/checkout@v4
+
+      - name: Ruby をセットアップ
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1.7'
+          bundler-cache: true
+          working-directory: ./user-api
+
+      - name: DB を作成・マイグレーション
+        working-directory: ./user-api
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: mysql2://shopping_user:shopping_password@127.0.0.1:3306/shopping_test
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:migrate
+
+      - name: テストを実行
+        working-directory: ./user-api
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: mysql2://shopping_user:shopping_password@127.0.0.1:3306/shopping_test
+        run: bundle exec rails test
+
+  # ===== Laravelのテスト =====
+  test-laravel:
+    name: Laravel Test
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: shopping_test
+          MYSQL_USER: shopping_user
+          MYSQL_PASSWORD: shopping_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -prootpassword"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: コードを取得
+        uses: actions/checkout@v4
+
+      - name: PHP をセットアップ
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo, pdo_mysql, bcmath
+          tools: composer
+
+      - name: Composer 依存関係をインストール
+        working-directory: ./admin-api
+        run: composer install --prefer-dist --no-progress
+
+      - name: .env を準備
+        working-directory: ./admin-api
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: マイグレーションとテストを実行
+        working-directory: ./admin-api
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: shopping_test
+          DB_USERNAME: shopping_user
+          DB_PASSWORD: shopping_password
+        run: |
+          php artisan migrate --force
+          php artisan test
+
+  # ===== frontendのテスト =====
+  test-frontend:
+    name: Frontend Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: コードを取得
+        uses: actions/checkout@v4
+
+      - name: Node.js をセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 依存関係をインストール
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: テストを実行
+        working-directory: ./frontend
+        run: npm run test:ci
