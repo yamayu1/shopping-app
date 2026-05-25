@@ -103,6 +103,7 @@ class ProductsController < ApplicationController
       description: detailed ? product.description : product.description.truncate(100),
       sku: product.sku,
       price: product.price.to_f,
+      sale_price: product.sale_price&.to_f,
       stock_quantity: product.stock_quantity,
       is_active: product.is_active,
       is_featured: product.is_featured || false,

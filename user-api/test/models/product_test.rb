@@ -30,4 +30,24 @@ class ProductTest < ActiveSupport::TestCase
     product.update(stock_quantity: 0)
     refute product.in_stock?
   end
+
+  def test_on_sale_when_sale_price_is_lower
+    product = build(:product, price: 1000, sale_price: 800)
+    assert product.on_sale?
+  end
+
+  def test_not_on_sale_when_sale_price_is_nil
+    product = build(:product, price: 1000, sale_price: nil)
+    refute product.on_sale?
+  end
+
+  def test_effective_price_returns_sale_price_when_on_sale
+    product = build(:product, price: 1000, sale_price: 800)
+    assert_equal 800, product.effective_price
+  end
+
+  def test_effective_price_returns_normal_price_when_not_on_sale
+    product = build(:product, price: 1000, sale_price: nil)
+    assert_equal 1000, product.effective_price
+  end
 end

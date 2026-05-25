@@ -67,13 +67,15 @@ class CartsController < ApplicationController
             id: item.product.id,
             name: item.product.name,
             price: item.product.price.to_f,
+            sale_price: item.product.sale_price&.to_f,
+            effective_price: item.product.effective_price.to_f,
             sku: item.product.sku,
             stock_quantity: item.product.stock_quantity,
             is_active: item.product.is_active,
             main_image: item.product.main_image&.url
           },
           quantity: item.quantity,
-          price: item.product.price.to_f,
+          price: item.product.effective_price.to_f,
           subtotal: item.subtotal.to_f
         }
       end,

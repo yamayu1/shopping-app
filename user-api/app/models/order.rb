@@ -60,7 +60,7 @@ class Order < ApplicationRecord
       order_items.create!(
         product: cart_item.product,
         quantity: cart_item.quantity,
-        price: cart_item.product.price
+        price: cart_item.product.effective_price
       )
     end
 

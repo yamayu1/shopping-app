@@ -59,6 +59,12 @@ const productSchema = yup.object().shape({
     .number()
     .required('価格は必須項目です')
     .min(1, '価格は1円以上で入力してください'),
+  sale_price: yup
+    .number()
+    .nullable()
+    .transform((value, original) => (original === '' ? null : value))
+    .min(0, 'セール価格は0以上で入力してください')
+    .max(yup.ref('price'), 'セール価格は通常価格より安く設定してください'),
   category_id: yup
     .number()
     .required('カテゴリは必須項目です'),
@@ -111,6 +117,7 @@ const AdminProducts: React.FC = () => {
       name: '',
       description: '',
       price: 0,
+      sale_price: null,
       category_id: 0,
       sku: '',
       stock_quantity: 0,
@@ -190,6 +197,7 @@ const AdminProducts: React.FC = () => {
       setValue('name', product.name);
       setValue('description', product.description);
       setValue('price', product.price);
+      setValue('sale_price', product.sale_price ?? null);
       setValue('category_id', product.category_id);
       setValue('sku', product.sku);
       setValue('stock_quantity', product.stock_quantity);
@@ -410,9 +418,24 @@ const AdminProducts: React.FC = () => {
                     {product.description}
                   </Typography>
                   <Box sx={{ mb: 2 }}>
-                    <Typography variant="h6" color="primary">
-                      {formatCurrency(product.price)}
-                    </Typography>
+                    {product.sale_price && product.sale_price < product.price ? (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="h6" color="error">
+                          {formatCurrency(product.sale_price)}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ textDecoration: 'line-through' }}
+                        >
+                          {formatCurrency(product.price)}
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Typography variant="h6" color="primary">
+                        {formatCurrency(product.price)}
+                      </Typography>
+                    )}
                   </Box>
                   <Box sx={{ display: 'flex', gap: 1, mb: 1, flexWrap: 'wrap' }}>
                     <Chip label={getCategoryName(product.category_id)} size="small" variant="outlined" />
@@ -519,6 +542,20 @@ const AdminProducts: React.FC = () => {
                     type="number"
                     error={!!errors.price}
                     helperText={errors.price?.message as string}
+                    disabled={loading}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    {...register('sale_price', { valueAsNumber: true })}
+                    fullWidth
+                    label="セール価格 (円) ※任意"
+                    type="number"
+                    error={!!errors.sale_price}
+                    helperText={
+                      (errors.sale_price?.message as string) ||
+                      '設定すると利益率もセール価格で計算されます'
+                    }
                     disabled={loading}
                   />
                 </Grid>
