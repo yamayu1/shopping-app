@@ -111,4 +111,32 @@ class ProductTest extends TestCase
         $this->assertTrue($result);
         $this->assertEquals(15, $product->fresh()->stock_quantity);
     }
+
+    /** @test */
+    public function it_can_subtract_stock(): void
+    {
+        $admin = Admin::factory()->create();
+        $this->actingAs($admin, 'admin');
+
+        $product = Product::factory()->create(['stock_quantity' => 10]);
+
+        $result = $product->updateStock(3, 'subtract', 'Order');
+
+        $this->assertTrue($result);
+        $this->assertEquals(7, $product->fresh()->stock_quantity);
+    }
+
+    /** @test */
+    public function it_returns_false_when_stock_is_insufficient(): void
+    {
+        $admin = Admin::factory()->create();
+        $this->actingAs($admin, 'admin');
+
+        $product = Product::factory()->create(['stock_quantity' => 3]);
+
+        $result = $product->updateStock(5, 'subtract', 'Order');
+
+        $this->assertFalse($result);
+        $this->assertEquals(3, $product->fresh()->stock_quantity);
+    }
 }
