@@ -172,33 +172,40 @@ class Product extends Model
         return $this->updateStock($quantity, 'add', '注文キャンセルによる在庫復元');
     }
 
-    // 在庫を更新（同時アクセス対策あり）
+    // 在庫を更新（同時アクセス対策あり・競合時はリトライ）
     public function updateStock(int $quantity, string $operation = 'subtract', string $reason = ''): bool
     {
-        if ($operation === 'subtract' && $this->stock_quantity < $quantity) {
-            return false;
+        $maxRetries = 3; // 最大3回まで試す
+
+        for ($attempt = 0; $attempt < $maxRetries; $attempt++) {
+
+            $this->refresh(); // 
+
+            // 在庫不足ならリトライしても無駄なので即終了
+            if ($operation === 'subtract' && $this->stock_quantity < $quantity) {
+                return false;
+            }
+
+            $newQuantity = $operation === 'add'
+                ? $this->stock_quantity + $quantity
+                : $this->stock_quantity - $quantity;
+
+            // 楽観的ロック：読んだ時から在庫が変わっていなければ更新できる
+            $updated = $this->where('id', $this->id)
+                        ->where('stock_quantity', $this->stock_quantity)
+                        ->update(['stock_quantity' => $newQuantity]);
+
+            if ($updated) {
+                $this->inventoryLogs()->create([
+                    'quantity_change' => $operation === 'add' ? $quantity : -$quantity,
+                    'quantity_after' => $newQuantity,
+                    'reason' => $reason,
+                    'admin_id' => auth('admin')->id(),
+                ]);
+                $this->refresh();
+                return true;
+            }
         }
-
-        $newQuantity = $operation === 'add'
-            ? $this->stock_quantity + $quantity
-            : $this->stock_quantity - $quantity;
-
-        // 楽観的ロック：現在の在庫数が変わっていないことを確認してから更新
-        $updated = $this->where('id', $this->id)
-                       ->where('stock_quantity', $this->stock_quantity)
-                       ->update(['stock_quantity' => $newQuantity]);
-
-        if ($updated) {
-            $this->inventoryLogs()->create([
-                'quantity_change' => $operation === 'add' ? $quantity : -$quantity,
-                'quantity_after' => $newQuantity,
-                'reason' => $reason,
-                'admin_id' => auth('admin')->id(),
-            ]);
-            $this->refresh();
-            return true;
-        }
-
-        return false;
+        return false; 
     }
 }
