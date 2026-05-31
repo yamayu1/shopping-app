@@ -289,50 +289,60 @@ class OrderController extends Controller
                 return $this->errorResponse('Validation failed', $validator->errors(), 422);
             }
 
+            $newStatus = $request->status;
+
             DB::beginTransaction();
 
             try {
-                $updatedOrders = [];
-                $failedOrders = [];
+                $orders = Order::with('orderItems.product')
+                    ->whereIn('order_number', $request->order_numbers)
+                    ->get();
 
-                foreach ($request->order_numbers as $orderNumber) {
-                    try {
-                        $order = Order::where('order_number', $orderNumber)->firstOrFail();
-                        $oldStatus = $order->status;
-                        $newStatus = $request->status;
+                $updatedOrders        = [];
+                $failedOrders         = [];
+                $idsToUpdate          = []; 
+                $idsNeedShippedAt     = []; 
+                $ordersToReleaseStock = []; 
 
-                        if ($this->isValidStatusTransition($oldStatus, $newStatus)) {
-                            $updateData = [
-                                'status' => $newStatus,
-                                'notes' => $request->notes,
-                            ];
+                foreach ($orders as $order) {
+                    $oldStatus = $order->status;
 
-                            if ($newStatus === Order::STATUS_SHIPPED && !$order->shipped_at) {
-                                $updateData['shipped_at'] = now();
-                            } elseif ($newStatus === Order::STATUS_DELIVERED) {
-                                $updateData['delivered_at'] = now();
-                                if (!$order->shipped_at) {
-                                    $updateData['shipped_at'] = now();
-                                }
-                            } elseif ($newStatus === Order::STATUS_CANCELLED) {
-                                $this->releaseOrderStock($order);
-                            }
-
-                            $order->update($updateData);
-                            $this->logStatusChange($order, $oldStatus, $newStatus, auth('admin')->id());
-                            
-                            $updatedOrders[] = $orderNumber;
-                        } else {
-                            $failedOrders[] = [
-                                'order_number' => $orderNumber,
-                                'reason' => "Invalid status transition from {$oldStatus} to {$newStatus}"
-                            ];
-                        }
-                    } catch (\Exception $e) {
+                    if (! $this->isValidStatusTransition($oldStatus, $newStatus)) {
                         $failedOrders[] = [
-                            'order_number' => $orderNumber,
-                            'reason' => $e->getMessage()
+                            'order_number' => $order->order_number,
+                            'reason' => "Invalid status transition from {$oldStatus} to {$newStatus}",
                         ];
+                        continue; 
+                    }
+
+                    $idsToUpdate[]   = $order->id;
+                    $updatedOrders[] = $order->order_number;
+
+                    if (($newStatus === Order::STATUS_SHIPPED || $newStatus === Order::STATUS_DELIVERED)
+                        && ! $order->shipped_at) {
+                        $idsNeedShippedAt[] = $order->id;
+                    }
+
+                    if ($newStatus === Order::STATUS_CANCELLED) {
+                        $ordersToReleaseStock[] = $order;
+                    }
+                }
+
+                if (! empty($idsToUpdate)) {
+                    $updateData = [
+                        'status' => $newStatus,
+                        'notes'  => $request->notes,
+                    ];
+                    if ($newStatus === Order::STATUS_DELIVERED) {
+                        $updateData['delivered_at'] = now();
+                    }
+                    Order::whereIn('id', $idsToUpdate)->update($updateData);
+
+                    if (! empty($idsNeedShippedAt)) {
+                        Order::whereIn('id', $idsNeedShippedAt)->update(['shipped_at' => now()]);
+                    }
+                    foreach ($ordersToReleaseStock as $order) {
+                        $this->releaseOrderStock($order);
                     }
                 }
 
@@ -340,9 +350,9 @@ class OrderController extends Controller
 
                 return $this->successResponse('Bulk status update completed', [
                     'updated_orders' => $updatedOrders,
-                    'failed_orders' => $failedOrders,
-                    'total_updated' => count($updatedOrders),
-                    'total_failed' => count($failedOrders)
+                    'failed_orders'  => $failedOrders,
+                    'total_updated'  => count($updatedOrders),
+                    'total_failed'   => count($failedOrders),
                 ]);
 
             } catch (\Exception $e) {
