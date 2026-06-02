@@ -131,4 +131,42 @@ class ProductApiTest extends TestCase
         $response->assertStatus(400);
         $this->assertDatabaseHas('products', ['id' => $product->id]);
     }
+
+    /** @test */
+    public function product_analytics_uses_specified_date_range(): void
+    {
+        $product = Product::factory()->create(['category_id' => $this->category->id]);
+
+        $response = $this->actingAs($this->admin, 'admin')
+                         ->getJson("/api/admin/products/{$product->id}/analytics?date_from=2026-04-01&date_to=2026-04-30");
+
+        $response->assertStatus(200)
+                 ->assertJsonPath('success', true)
+                 ->assertJsonPath('data.date_range.from', '2026-04-01')
+                 ->assertJsonPath('data.date_range.to', '2026-04-30');
+    }
+
+    /** @test */
+    public function product_analytics_defaults_to_last_30_days(): void
+    {
+        $product = Product::factory()->create(['category_id' => $this->category->id]);
+
+        $response = $this->actingAs($this->admin, 'admin')
+                         ->getJson("/api/admin/products/{$product->id}/analytics");
+
+        $response->assertStatus(200)
+                 ->assertJsonPath('data.date_range.from', now()->subDays(30)->toDateString())
+                 ->assertJsonPath('data.date_range.to', now()->toDateString());
+    }
+
+    /** @test */
+    public function product_analytics_rejects_invalid_date(): void
+    {
+        $product = Product::factory()->create(['category_id' => $this->category->id]);
+
+        $response = $this->actingAs($this->admin, 'admin')
+                         ->getJson("/api/admin/products/{$product->id}/analytics?date_from=not-a-date");
+
+        $response->assertStatus(422);
+    }
 }

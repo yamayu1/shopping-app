@@ -394,10 +394,14 @@ class ProductController extends Controller
     public function analytics(Request $request, int $id): JsonResponse
     {
         try {
-            $request->validate([
+            $validator = Validator::make($request->all(), [
                 'date_from' => 'nullable|date',
                 'date_to' => 'nullable|date|after_or_equal:date_from',
             ]);
+
+            if ($validator->fails()) {
+                return $this->errorResponse('Validation failed', $validator->errors(), 422);
+            }
 
             $dateFrom = $request->get('date_from', now()->subDays(30)->toDateString());
             $dateTo = $request->get('date_to', now()->toDateString());
