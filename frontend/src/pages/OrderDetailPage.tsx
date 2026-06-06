@@ -18,6 +18,11 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import { Order } from '../types';
@@ -31,6 +36,8 @@ const OrderDetailPage: React.FC = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [cancelOpen, setCancelOpen] = useState(false);   
+  const [cancelling, setCancelling] = useState(false); 
 
   useEffect(() => {
     if (id) {
@@ -49,6 +56,23 @@ const OrderDetailPage: React.FC = () => {
       setError('注文詳細の読み込みに失敗しました');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // キャンセルボタンを押したときの処理
+  const handleCancel = async () => {
+    if (!order) return;
+    try {
+      setCancelling(true);
+      await orderService.cancelOrder(order.id);  
+      setCancelOpen(false);
+      await loadOrder(order.id);
+    } catch (err) {
+      console.error('キャンセルエラー:', err);
+      setError('注文のキャンセルに失敗しました');
+      setCancelOpen(false);
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -93,6 +117,8 @@ const OrderDetailPage: React.FC = () => {
       </Container>
     );
   }
+
+  const canCancel = order.status === 'pending' || order.status === 'confirmed';
 
   return (
     <Container maxWidth="lg">
@@ -314,10 +340,40 @@ const OrderDetailPage: React.FC = () => {
                   </Typography>
                 </>
               )}
+              {canCancel && (
+                <>
+                  <Divider sx={{ my: 2 }} />
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    fullWidth
+                    onClick={() => setCancelOpen(true)}
+                  >
+                    注文をキャンセル
+                  </Button>
+                </>
+              )}  
             </Paper>
           </Grid>
         </Grid>
       </Box>
+      <Dialog open={cancelOpen} onClose={() => setCancelOpen(false)}>
+        <DialogTitle>注文のキャンセル</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            本当にこの注文をキャンセルしますか？<br/>
+            ※ キャンセルすると元に戻せません。
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCancelOpen(false)} disabled={cancelling}>
+            戻る
+          </Button>
+          <Button onClick={handleCancel} color="error" disabled={cancelling}>
+            {cancelling ? 'キャンセル中...' : 'キャンセル'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
