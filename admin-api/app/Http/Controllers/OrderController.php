@@ -209,27 +209,36 @@ class OrderController extends Controller
             $dateTo = $request->get('date_to', now()->toDateString());
 
             $baseQuery = Order::whereBetween('created_at', [$dateFrom, $dateTo]);
+            
+            $statusCounts = (clone $baseQuery)
+                ->select('status', DB::raw('COUNT(*) as total'))
+                ->groupBy('status')
+                ->pluck('total', 'status');
+
+            $paymentStatusCounts = (clone $baseQuery)
+                ->select('payment_status', DB::raw('COUNT(*) as total'))
+                ->groupBy('payment_status')
+                ->pluck('total', 'payment_status');
 
             $statistics = [
                 'total_orders' => (clone $baseQuery)->count(),
                 'total_revenue' => (clone $baseQuery)->sum('total_amount'),
                 'average_order_value' => (clone $baseQuery)->avg('total_amount'),
-                
                 'orders_by_status' => [
-                    'pending' => (clone $baseQuery)->where('status', Order::STATUS_PENDING)->count(),
-                    'confirmed' => (clone $baseQuery)->where('status', Order::STATUS_CONFIRMED)->count(),
-                    'processing' => (clone $baseQuery)->where('status', Order::STATUS_PROCESSING)->count(),
-                    'shipped' => (clone $baseQuery)->where('status', Order::STATUS_SHIPPED)->count(),
-                    'delivered' => (clone $baseQuery)->where('status', Order::STATUS_DELIVERED)->count(),
-                    'cancelled' => (clone $baseQuery)->where('status', Order::STATUS_CANCELLED)->count(),
-                    'refunded' => (clone $baseQuery)->where('status', Order::STATUS_REFUNDED)->count(),
+                    'pending' => $statusCounts->get(Order::STATUS_PENDING, 0),
+                    'confirmed' => $statusCounts->get(Order::STATUS_CONFIRMED, 0),
+                    'processing' => $statusCounts->get(Order::STATUS_PROCESSING, 0),
+                    'shipped' => $statusCounts->get(Order::STATUS_SHIPPED, 0),
+                    'delivered' => $statusCounts->get(Order::STATUS_DELIVERED, 0),
+                    'cancelled' => $statusCounts->get(Order::STATUS_CANCELLED, 0),
+                    'refunded' => $statusCounts->get(Order::STATUS_REFUNDED, 0),
                 ],
 
                 'payment_status' => [
-                    'pending' => (clone $baseQuery)->where('payment_status', 'pending')->count(),
-                    'paid' => (clone $baseQuery)->where('payment_status', 'paid')->count(),
-                    'failed' => (clone $baseQuery)->where('payment_status', 'failed')->count(),
-                    'refunded' => (clone $baseQuery)->where('payment_status', 'refunded')->count(),
+                    'pending' => $paymentStatusCounts->get('pending', 0),
+                    'paid' => $paymentStatusCounts->get('paid', 0),
+                    'failed' => $paymentStatusCounts->get('failed', 0),
+                    'refunded' => $paymentStatusCounts->get('refunded', 0),
                 ],
             ];
 
