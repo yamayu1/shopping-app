@@ -31,6 +31,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "type-check": "tsc --noEmit", 
     "test:coverage": "react-scripts test --coverage --watchAll=false",
     "test:ci": "CI=true react-scripts test --coverage",
     "eject": "react-scripts eject",
