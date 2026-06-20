@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -97,7 +98,9 @@ class Product extends Model
         return array_map(function ($path, $index) {
             // すでにオブジェクト形式の場合はそのまま
             if (is_array($path)) return $path;
-            $url = str_starts_with($path, 'http') ? $path : asset('storage/' . $path);
+            $url = str_starts_with($path, 'http') 
+                ? $path 
+                : Storage::disk(config('filesystems.default'))->url($path);
             return [
                 'id' => $index,
                 'url' => $url,
