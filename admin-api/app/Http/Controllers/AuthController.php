@@ -50,10 +50,10 @@ class AuthController extends Controller
 
         } catch (JWTException $e) {
             \Log::error('JWT Login Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return $this->errorResponse('Could not create token', $e->getMessage(), 500);
+            return $this->errorResponse('Could not create token', null, 500);
         } catch (\Exception $e) {
             \Log::error('Login Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return $this->errorResponse('Login failed', $e->getMessage(), 500);
+            return $this->errorResponse('Login failed', null, 500);
         }
     }
 
@@ -78,7 +78,8 @@ class AuthController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Registration failed', $e->getMessage(), 500);
+            \Log::error('Registration Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return $this->errorResponse('Registration failed', null, 500);
         }
     }
 
@@ -135,7 +136,8 @@ class AuthController extends Controller
             return $this->successResponse('Password changed successfully', null);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to change password', $e->getMessage(), 500);
+            \Log::error('Change Password Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return $this->errorResponse('Failed to change password', null, 500);
         }
     }
 
@@ -189,7 +191,8 @@ class AuthController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to retrieve admins', $e->getMessage(), 500);
+            \Log::error('Get Admins Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return $this->errorResponse('Failed to retrieve admins', null, 500);
         }
     }
 
@@ -214,7 +217,8 @@ class AuthController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to update admin status', $e->getMessage(), 500);
+            \Log::error('Update Admin Status Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return $this->errorResponse('Failed to update admin status', null, 500);
         }
     }
 
