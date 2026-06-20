@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use App\Http\Requests\Category\StoreCategoryRequest;
+use App\Http\Requests\Category\UpdateCategoryRequest;
+use App\Http\Requests\Category\UpdateCategorySortOrderRequest;
 
 class CategoryController extends Controller
 {
@@ -54,27 +57,9 @@ class CategoryController extends Controller
             return $this->errorResponse('Failed to retrieve categories', $e->getMessage(), 500);
         }
     }
-    public function store(Request $request): JsonResponse
+    public function store(StoreCategoryRequest $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
-                'slug' => 'nullable|string|max:255|unique:categories,slug',
-                'description' => 'nullable|string',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-                'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:1024',
-                'sort_order' => 'nullable|integer|min:0',
-                'is_active' => 'boolean',
-                'is_featured' => 'boolean',
-                'meta_title' => 'nullable|string|max:255',
-                'meta_description' => 'nullable|string|max:500',
-                'custom_attributes' => 'nullable|json',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             DB::beginTransaction();
 
             try {
@@ -164,30 +149,10 @@ class CategoryController extends Controller
             return $this->errorResponse('Category not found', $e->getMessage(), 404);
         }
     }
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateCategoryRequest $request, int $id): JsonResponse
     {
         try {
             $category = Category::findOrFail($id);
-
-            $validator = Validator::make($request->all(), [
-                'name' => 'sometimes|required|string|max:255',
-                'slug' => 'sometimes|string|max:255|unique:categories,slug,' . $id,
-                'description' => 'nullable|string',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-                'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:1024',
-                'sort_order' => 'nullable|integer|min:0',
-                'is_active' => 'boolean',
-                'is_featured' => 'boolean',
-                'meta_title' => 'nullable|string|max:255',
-                'meta_description' => 'nullable|string|max:500',
-                'custom_attributes' => 'nullable|json',
-                'remove_image' => 'boolean',
-                'remove_icon' => 'boolean',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
 
             DB::beginTransaction();
 
@@ -292,19 +257,9 @@ class CategoryController extends Controller
             return $this->errorResponse('Failed to delete category', $e->getMessage(), 500);
         }
     }
-    public function updateSortOrder(Request $request): JsonResponse
+    public function updateSortOrder(UpdateCategorySortOrderRequest $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'categories' => 'required|array|min:1',
-                'categories.*.id' => 'required|exists:categories,id',
-                'categories.*.sort_order' => 'required|integer|min:0',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             DB::beginTransaction();
 
             try {
