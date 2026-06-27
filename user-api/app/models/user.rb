@@ -47,6 +47,13 @@ class User < ApplicationRecord
     password_reset_expires_at < Time.current
   end
 
+  def set_default_address(address)
+    transaction do
+      addresses.update_all(is_default: false)
+      address.update!(is_default: true)
+    end
+  end
+
   private
 
   def create_cart

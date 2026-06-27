@@ -20,9 +20,6 @@ class Address < ApplicationRecord
   end
 
   def set_as_default
-    transaction do
-      user.addresses.update_all(is_default: false)
-      update!(is_default: true)
-    end
+    user.set_default_address(self)
   end
 end
