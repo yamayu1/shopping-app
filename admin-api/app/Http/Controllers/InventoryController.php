@@ -136,55 +136,67 @@ class InventoryController extends Controller
             try {
                 $updatedProducts = [];
                 $failedUpdates = [];
+                $logsToInsert = [];
+
+                $productIds = collect($request->updates)->pluck('product_id');
+                $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+
+                $now = now();
+                $adminId = auth('admin')->id();
 
                 foreach ($request->updates as $update) {
-                    try {
-                        $product = Product::findOrFail($update['product_id']);
-                        $oldQuantity = $product->stock_quantity;
-                        $newQuantity = $oldQuantity;
-                        $quantityChange = 0;
-
-                        switch ($update['operation']) {
-                            case 'add':
-                                $newQuantity = $oldQuantity + $update['quantity'];
-                                $quantityChange = $update['quantity'];
-                                break;
-                            case 'subtract':
-                                $newQuantity = max(0, $oldQuantity - $update['quantity']);
-                                $quantityChange = -($oldQuantity - $newQuantity);
-                                break;
-                            case 'set':
-                                $newQuantity = $update['quantity'];
-                                $quantityChange = $newQuantity - $oldQuantity;
-                                break;
-                        }
-
-                        $product->update(['stock_quantity' => $newQuantity]);
-
-                        InventoryLog::create([
-                            'product_id' => $product->id,
-                            'admin_id' => auth('admin')->id(),
-                            'quantity_change' => $quantityChange,
-                            'quantity_after' => $newQuantity,
-                            'reason' => $request->reason,
-                            'notes' => $request->notes,
-                        ]);
-
-                        $updatedProducts[] = [
-                            'product_id' => $product->id,
-                            'name' => $product->name,
-                            'sku' => $product->sku,
-                            'old_quantity' => $oldQuantity,
-                            'new_quantity' => $newQuantity,
-                            'change' => $quantityChange
-                        ];
-
-                    } catch (\Exception $e) {
+                    $product = $products->get($update['product_id']);
+                    if (!$product) {
                         $failedUpdates[] = [
                             'product_id' => $update['product_id'],
-                            'error' => $e->getMessage()
+                            'error' => 'Product not found',
                         ];
+                        continue;
                     }
+
+                    $oldQuantity = $product->stock_quantity;
+                    $newQuantity = $oldQuantity;
+                    $quantityChange = 0;
+
+                    switch ($update['operation']) {
+                        case 'add':
+                            $newQuantity = $oldQuantity + $update['quantity'];
+                            $quantityChange = $update['quantity'];
+                            break;
+                        case 'subtract':
+                            $newQuantity = max(0, $oldQuantity - $update['quantity']);
+                            $quantityChange = -($oldQuantity - $newQuantity);
+                            break;
+                        case 'set':
+                            $newQuantity = $update['quantity'];
+                            $quantityChange = $newQuantity - $oldQuantity;
+                            break;
+                    }
+
+                    $product->update(['stock_quantity' => $newQuantity]);
+                    $logsToInsert[] = [
+                        'product_id' => $product->id,
+                        'admin_id' => $adminId,
+                        'quantity_change' => $quantityChange,
+                        'quantity_after' => $newQuantity,
+                        'reason' => $request->reason,
+                        'notes' => $request->notes,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+
+                    $updatedProducts[] = [
+                        'product_id' => $product->id,
+                        'name' => $product->name,
+                        'sku' => $product->sku,
+                        'old_quantity' => $oldQuantity,
+                        'new_quantity' => $newQuantity,
+                        'change' => $quantityChange
+                    ];
+                }
+                
+                if (!empty($logsToInsert)) {
+                    InventoryLog::insert($logsToInsert);
                 }
 
                 DB::commit();
