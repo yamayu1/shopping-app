@@ -39,12 +39,19 @@ services:
       DATABASE_URL: mysql2://shopping_user:shopping_password@mysql:3306/shopping_development
       REDIS_URL: redis://redis:6379/0
       RAILS_ENV: development
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      APP_HOST: ${APP_HOST}
+      APP_PORT: ${APP_PORT}
+      APP_PROTOCOL: ${APP_PROTOCOL}
     ports:
       - "3001:3000"
     depends_on:
       mysql:
         condition: service_healthy
       redis:
+        condition: service_started
+      mailpit:
         condition: service_started
     networks:
       - shopping_network
@@ -55,6 +62,15 @@ services:
         bundle exec rails db:seed || true &&
         bundle exec rails server -b 0.0.0.0 -p 3000
       "
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: shopping_mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - shopping_network
 
   laravel_admin:
     build:
