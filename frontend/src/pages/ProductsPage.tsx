@@ -18,15 +18,16 @@ import {
 import { Search, FilterList } from '@mui/icons-material';
 import { Product, Category, ProductFilters as ProductFiltersType } from '../types';
 import { productService } from '../services/productService';
-import { cartService } from '../services/cartService';
 import ProductCard from '../components/products/ProductCard';
 import ProductFilters from '../components/products/ProductFilters';
 import { ROUTES } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 
 const ProductsPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { addToCart } = useCart();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [searchParams, setSearchParams] = useSearchParams();
@@ -110,7 +111,8 @@ const ProductsPage: React.FC = () => {
     }
 
     try {
-      await cartService.addItem(product.id, 1);
+      await addToCart(product.id, 1);
+      navigate(ROUTES.CART);
     } catch (err: any) {
       console.error('カート追加エラー:', err);
       setError('カートへの追加に失敗しました');
