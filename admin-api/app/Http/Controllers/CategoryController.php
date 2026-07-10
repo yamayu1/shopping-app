@@ -131,15 +131,20 @@ class CategoryController extends Controller
     public function show(int $id): JsonResponse
     {
         try {
-            $category = Category::with([
+            $category = Category::withCount([
+                'products as total_count',
+                'products as active_count' => function ($query) {
+                    $query->where('is_active', true);
+                },
+            ])->with([
                 'products' => function ($query) {
                     $query->active()->limit(10)->select('id', 'name', 'sku', 'price', 'category_id');
                 }
             ])->findOrFail($id);
 
-            // 追加メトリクスを付加
-            $category->total_products = $category->products_count;
-            $category->active_products = $category->activeProducts()->count();
+            // 追加メトリクスを付加（DBには問い合わせず、上で取得済みの値を入れるだけ）
+            $category->total_products = $category->total_count;
+            $category->active_products = $category->active_count;
 
             return $this->successResponse('Category retrieved successfully', [
                 'category' => $category
@@ -294,11 +299,16 @@ class CategoryController extends Controller
     public function analytics(int $id): JsonResponse
     {
         try {
-            $category = Category::findOrFail($id);
+            $category = Category::withCount([
+                'products as total_count',
+                'products as active_count' => function ($query) {
+                    $query->where('is_active', true);
+                },
+            ])->findOrFail($id);
 
             $analytics = [
-                'total_products' => $category->products_count,
-                'active_products' => $category->activeProducts()->count(),
+                'total_products' => $category->total_count,
+                'active_products' => $category->active_count,
             ];
 
             // カテゴリの売上を取得（このカテゴリの全商品売上合計）
