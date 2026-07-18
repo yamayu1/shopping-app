@@ -68,6 +68,12 @@ export const PAYMENT_STATUS_OPTIONS = [
   { value: 'refunded', label: '返金済み', color: '#6b7280' },
 ];
 
+export const PAYMENT_METHOD_OPTIONS = [
+  { value: 'credit_card', label: 'クレジットカード' },
+  { value: 'bank_transfer', label: '銀行振込' },
+  { value: 'cash_on_delivery', label: '代金引換' },
+];
+
 // ソートオプション
 export const PRODUCT_SORT_OPTIONS = [
   { value: 'name-asc', label: '商品名 あ→ん' },
@@ -88,7 +94,6 @@ export const VALIDATION_RULES = {
   SKU_PATTERN: /^[A-Z0-9-]{3,20}$/,
 };
 
-// ここにまとめすぎかも...
 export const CART = {
   MAX_QUANTITY: 99,
   MIN_QUANTITY: 1,

@@ -34,7 +34,7 @@ import { Search, Visibility } from '@mui/icons-material';
 import { adminOrderService } from '../../services/adminOrderService';
 import { Order, OrderStatus } from '../../types';
 import { formatCurrency } from '../../utils/helpers';
-import { ROUTES, ORDER_STATUS_OPTIONS } from '../../utils/constants';
+import { ROUTES, ORDER_STATUS_OPTIONS, PAYMENT_METHOD_OPTIONS } from '../../utils/constants';
 
 const AdminOrders: React.FC = () => {
   const navigate = useNavigate();
@@ -121,6 +121,11 @@ const AdminOrders: React.FC = () => {
   const getStatusLabel = (status: OrderStatus) => {
     const option = ORDER_STATUS_OPTIONS.find(opt => opt.value === status);
     return option?.label || status;
+  };
+
+  const getPaymentMethodLabel = (method: string) => {
+    const option = PAYMENT_METHOD_OPTIONS.find(opt => opt.value === method);
+    return option?.label || method;
   };
 
   const handleChangePage = (_event: unknown, newPage: number) => {
@@ -332,7 +337,7 @@ const AdminOrders: React.FC = () => {
                     <Typography variant="body2" color="text.secondary">
                       支払い方法
                     </Typography>
-                    <Typography variant="body1">{selectedOrder.payment_method}</Typography>
+                    <Typography variant="body1">{getPaymentMethodLabel(selectedOrder.payment_method)}</Typography>
                   </Grid>
                 </Grid>
 
@@ -343,7 +348,7 @@ const AdminOrders: React.FC = () => {
                   注文商品
                 </Typography>
                 <Stack spacing={1} sx={{ mb: 3 }}>
-                  {selectedOrder.items.map((item) => (
+                  {(selectedOrder.items ?? []).map((item) => (
                     <Box
                       key={item.id}
                       sx={{
@@ -373,19 +378,27 @@ const AdminOrders: React.FC = () => {
                 <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
                   配送先住所
                 </Typography>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  {selectedOrder.shipping_address.last_name} {selectedOrder.shipping_address.first_name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  〒{selectedOrder.shipping_address.postal_code}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {selectedOrder.shipping_address.prefecture} {selectedOrder.shipping_address.city}{' '}
-                  {selectedOrder.shipping_address.address_line1}
-                </Typography>
-                {selectedOrder.shipping_address.phone && (
+                {selectedOrder.shipping_address ? (
+                  <>
+                    <Typography variant="body2" sx={{ mb: 1 }}>
+                      {selectedOrder.shipping_address.last_name} {selectedOrder.shipping_address.first_name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      〒{selectedOrder.shipping_address.postal_code}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {selectedOrder.shipping_address.prefecture} {selectedOrder.shipping_address.city}{' '}
+                      {selectedOrder.shipping_address.address_line1}
+                    </Typography>
+                    {selectedOrder.shipping_address.phone && (
+                      <Typography variant="body2" color="text.secondary">
+                        電話: {selectedOrder.shipping_address.phone}
+                      </Typography>
+                    )}
+                  </>
+                ) : (
                   <Typography variant="body2" color="text.secondary">
-                    電話: {selectedOrder.shipping_address.phone}
+                    配送先住所は登録されていません
                   </Typography>
                 )}
 
