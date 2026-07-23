@@ -111,4 +111,31 @@ class ProductTest extends TestCase
         $this->assertTrue($result);
         $this->assertEquals(15, $product->fresh()->stock_quantity);
     }
+
+    /** @test */
+    public function it_records_audit_and_inventory_log_when_stock_updated(): void
+    {
+        config(['audit.console' => true]);
+        $admin = Admin::factory()->create();
+        $this->actingAs($admin, 'admin');
+
+        $product = Product::factory()->create(['stock_quantity' => 10]);
+
+        $result = $product->updateStock(3, 'subtract', 'テスト理由');
+
+        $this->assertTrue($result);
+        $this->assertEquals(7, $product->fresh()->stock_quantity);
+
+        $this->assertDatabaseHas('audits', [
+            'auditable_type' => Product::class,
+            'auditable_id'   => $product->id,
+            'event'          => 'updated',
+        ]);
+
+        $this->assertDatabaseHas('inventory_logs', [
+            'product_id'      => $product->id,
+            'quantity_change' => -3,
+            'quantity_after'  => 7,
+        ]);
+    }
 }

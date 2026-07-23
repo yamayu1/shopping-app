@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\Order\UpdateOrderStatusRequest;
+use App\Http\Requests\Order\UpdatePaymentStatusRequest;
+use App\Http\Requests\Order\BulkUpdateOrderStatusRequest;
 
 class OrderController extends Controller
 {
@@ -97,27 +100,9 @@ class OrderController extends Controller
             'order' => $order
         ]);
     }
-    public function updateStatus(Request $request, string $orderNumber): JsonResponse
+    public function updateStatus(UpdateOrderStatusRequest $request, string $orderNumber): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'status' => 'required|string|in:' . implode(',', [
-                    Order::STATUS_PENDING,
-                    Order::STATUS_CONFIRMED,
-                    Order::STATUS_PROCESSING,
-                    Order::STATUS_SHIPPED,
-                    Order::STATUS_DELIVERED,
-                    Order::STATUS_CANCELLED,
-                    Order::STATUS_REFUNDED
-                ]),
-                'notes' => 'nullable|string|max:1000',
-                'tracking_number' => 'nullable|string|max:255',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             $order = Order::where('order_number', $orderNumber)->firstOrFail();
             $oldStatus = $order->status;
             $newStatus = $request->status;
@@ -169,19 +154,9 @@ class OrderController extends Controller
             return $this->errorResponse('Failed to update order status', $e->getMessage(), 500);
         }
     }
-    public function updatePaymentStatus(Request $request, string $orderNumber): JsonResponse
+    public function updatePaymentStatus(UpdatePaymentStatusRequest $request, string $orderNumber): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'payment_status' => 'required|string|in:pending,paid,failed,refunded,partially_refunded',
-                'payment_reference' => 'nullable|string|max:255',
-                'notes' => 'nullable|string|max:1000',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             $order = Order::where('order_number', $orderNumber)->firstOrFail();
 
             $order->update([
@@ -267,28 +242,9 @@ class OrderController extends Controller
             return $this->errorResponse('Failed to retrieve order statistics', $e->getMessage(), 500);
         }
     }
-    public function bulkUpdateStatus(Request $request): JsonResponse
+    public function bulkUpdateStatus(BulkUpdateOrderStatusRequest $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'order_numbers' => 'required|array|min:1',
-                'order_numbers.*' => 'required|string|exists:orders,order_number',
-                'status' => 'required|string|in:' . implode(',', [
-                    Order::STATUS_PENDING,
-                    Order::STATUS_CONFIRMED,
-                    Order::STATUS_PROCESSING,
-                    Order::STATUS_SHIPPED,
-                    Order::STATUS_DELIVERED,
-                    Order::STATUS_CANCELLED,
-                    Order::STATUS_REFUNDED
-                ]),
-                'notes' => 'nullable|string|max:1000',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             DB::beginTransaction();
 
             try {

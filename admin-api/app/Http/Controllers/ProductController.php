@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use App\Http\Requests\Product\StoreProductRequest;
+use App\Http\Requests\Product\UpdateProductRequest;
+use App\Http\Requests\Product\BulkUpdateProductStockRequest;
+use App\Http\Requests\Product\UploadProductImageRequest;
 
 class ProductController extends Controller
 {
@@ -89,38 +93,9 @@ class ProductController extends Controller
     }
 
     // 商品登録。バリデーションは今後もう少し厳密にする予定
-    public function store(Request $request): JsonResponse
+    public function store(StoreProductRequest $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'short_description' => 'nullable|string|max:500',
-                'sku' => 'required|string|max:100|unique:products,sku',
-                'price' => 'required|numeric|min:0',
-                'sale_price' => 'nullable|numeric|min:0|lt:price',
-                'cost_price' => 'nullable|numeric|min:0',
-                'stock_quantity' => 'required|integer|min:0',
-                'low_stock_threshold' => 'nullable|integer|min:0',
-                'category_id' => 'required|exists:categories,id',
-                'brand' => 'nullable|string|max:255',
-                'color' => 'nullable|string|max:100',
-                'size' => 'nullable|string|max:100',
-                'material' => 'nullable|string|max:255',
-                'is_active' => 'boolean',
-                'is_featured' => 'boolean',
-                'meta_title' => 'nullable|string|max:255',
-                'meta_description' => 'nullable|string|max:500',
-                'tags' => 'nullable|array',
-                'images' => 'nullable|array|max:10',
-                'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-                'custom_attributes' => 'nullable|json',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             DB::beginTransaction();
 
             try {
@@ -191,41 +166,10 @@ class ProductController extends Controller
         ]);
     }
 
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateProductRequest $request, int $id): JsonResponse
     {
         try {
             $product = Product::findOrFail($id);
-
-            $validator = Validator::make($request->all(), [
-                'name' => 'sometimes|required|string|max:255',
-                'description' => 'nullable|string',
-                'short_description' => 'nullable|string|max:500',
-                'sku' => 'sometimes|required|string|max:100|unique:products,sku,' . $id,
-                'price' => 'sometimes|required|numeric|min:0',
-                'sale_price' => 'nullable|numeric|min:0|lt:price',
-                'cost_price' => 'nullable|numeric|min:0',
-                'stock_quantity' => 'sometimes|required|integer|min:0',
-                'low_stock_threshold' => 'nullable|integer|min:0',
-                'category_id' => 'sometimes|required|exists:categories,id',
-                'brand' => 'nullable|string|max:255',
-                'color' => 'nullable|string|max:100',
-                'size' => 'nullable|string|max:100',
-                'material' => 'nullable|string|max:255',
-                'is_active' => 'boolean',
-                'is_featured' => 'boolean',
-                'meta_title' => 'nullable|string|max:255',
-                'meta_description' => 'nullable|string|max:500',
-                'tags' => 'nullable|array',
-                'new_images' => 'nullable|array|max:10',
-                'new_images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-                'remove_images' => 'nullable|array',
-                'custom_attributes' => 'nullable|json',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             DB::beginTransaction();
 
             try {
@@ -323,20 +267,9 @@ class ProductController extends Controller
         }
     }
 
-    public function bulkUpdateStock(Request $request): JsonResponse
+    public function bulkUpdateStock(BulkUpdateProductStockRequest $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'products' => 'required|array|min:1',
-                'products.*.id' => 'required|exists:products,id',
-                'products.*.stock_quantity' => 'required|integer|min:0',
-                'reason' => 'nullable|string|max:255',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             DB::beginTransaction();
 
             try {
@@ -426,19 +359,10 @@ class ProductController extends Controller
         }
     }
 
-    public function uploadImage(Request $request, int $id): JsonResponse
+    public function uploadImage(UploadProductImageRequest $request, int $id): JsonResponse
     {
         try {
             $product = Product::findOrFail($id);
-
-            $validator = Validator::make($request->all(), [
-                'image' => 'required|file|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             $image = $request->file('image');
             $filename = time() . '_' . Str::random(10) . '.' . $image->getClientOriginalExtension();
             $path = $image->storeAs('products', $filename, 'public');

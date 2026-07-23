@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\Inventory\UpdateStockRequest;
+use App\Http\Requests\Inventory\BulkUpdateStockRequest;
 
 class InventoryController extends Controller
 {
@@ -70,20 +72,9 @@ class InventoryController extends Controller
             return $this->errorResponse('Failed to retrieve inventory', $e->getMessage(), 500);
         }
     }
-    public function updateStock(Request $request, int $productId): JsonResponse
+    public function updateStock(UpdateStockRequest $request, int $productId): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'operation' => 'required|string|in:add,subtract,set',
-                'quantity' => 'required|integer|min:0',
-                'reason' => 'required|string|max:255',
-                'notes' => 'nullable|string|max:1000',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             $product = Product::findOrFail($productId);
 
             DB::beginTransaction();
@@ -137,22 +128,9 @@ class InventoryController extends Controller
             return $this->errorResponse('Failed to update stock', $e->getMessage(), 500);
         }
     }
-    public function bulkUpdateStock(Request $request): JsonResponse
+    public function bulkUpdateStock(BulkUpdateStockRequest $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'updates' => 'required|array|min:1',
-                'updates.*.product_id' => 'required|exists:products,id',
-                'updates.*.operation' => 'required|string|in:add,subtract,set',
-                'updates.*.quantity' => 'required|integer|min:0',
-                'reason' => 'required|string|max:255',
-                'notes' => 'nullable|string|max:1000',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             DB::beginTransaction();
 
             try {

@@ -99,3 +99,7 @@ docs:
 db-reset:
 	docker-compose run --rm rails_api bundle exec rails db:drop db:create db:migrate db:seed
 	docker-compose run --rm laravel_admin php artisan migrate:fresh --seed --force
+
+# フロントエンドの型チェック
+type-check:
+	docker-compose run --rm frontend npm run type-check

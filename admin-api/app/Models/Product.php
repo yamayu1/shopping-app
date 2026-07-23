@@ -5,10 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use OwenIt\Auditing\Auditable;
+use Illuminate\Support\Facades\DB;
 
-class Product extends Model
+class Product extends Model implements AuditableContract
 {
     use HasFactory;
+    use Auditable;
 
     protected $fillable = [
         'name',
@@ -175,30 +179,30 @@ class Product extends Model
     // 在庫を更新（同時アクセス対策あり）
     public function updateStock(int $quantity, string $operation = 'subtract', string $reason = ''): bool
     {
-        if ($operation === 'subtract' && $this->stock_quantity < $quantity) {
-            return false;
-        }
+        return DB::transaction(function () use ($quantity, $operation, $reason) {
+            // 行ロックして最新在庫を取り直す（悲観的ロック）
+            $product = self::query()->lockForUpdate()->find($this->id);
 
-        $newQuantity = $operation === 'add'
-            ? $this->stock_quantity + $quantity
-            : $this->stock_quantity - $quantity;
+            if ($operation === 'subtract' && $product->stock_quantity < $quantity) {
+                return false;
+            }
 
-        // 楽観的ロック：現在の在庫数が変わっていないことを確認してから更新
-        $updated = $this->where('id', $this->id)
-                       ->where('stock_quantity', $this->stock_quantity)
-                       ->update(['stock_quantity' => $newQuantity]);
+            $newQuantity = $operation === 'add'
+                ? $product->stock_quantity + $quantity
+                : $product->stock_quantity - $quantity;
 
-        if ($updated) {
-            $this->inventoryLogs()->create([
+            $product->stock_quantity = $newQuantity;
+            $product->save(); 
+
+            $product->inventoryLogs()->create([
                 'quantity_change' => $operation === 'add' ? $quantity : -$quantity,
-                'quantity_after' => $newQuantity,
-                'reason' => $reason,
-                'admin_id' => auth('admin')->id(),
+                'quantity_after'  => $newQuantity,
+                'reason'          => $reason,
+                'admin_id'        => auth('admin')->id(),
             ]);
-            $this->refresh();
-            return true;
-        }
 
-        return false;
+            $this->refresh();  
+            return true;
+        });
     }
 }

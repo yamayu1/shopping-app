@@ -47,4 +47,33 @@ class AuthenticationControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal 401, response.status
   end
+
+  def test_reset_password_with_valid_token
+    @user.generate_password_reset_token
+    token = @user.password_reset_token
+
+    post '/api/auth/reset_password', params: {
+      token: token,
+      password: 'NewPassword123!'
+    }.to_json, headers: { 'Content-Type' => 'application/json' }
+
+    assert_equal 200, response.status
+    assert @user.reload.authenticate('NewPassword123!')
+  end
+
+  def test_reset_password_with_expired_token
+    @user.generate_password_reset_token
+    token = @user.password_reset_token
+
+    travel_to 2.hours.from_now do
+      post '/api/auth/reset_password', params: {
+        token: token,
+        password: 'NewPassword123!'
+      }.to_json, headers: { 'Content-Type' => 'application/json' }
+
+      assert_equal 400, response.status
+    end
+
+    assert @user.reload.authenticate('Password123!')
+  end
 end
