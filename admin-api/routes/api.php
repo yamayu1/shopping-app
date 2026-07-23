@@ -37,9 +37,11 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
         Route::put('/password', [AuthController::class, 'changePassword']);
         
         // 管理者管理（スーパー管理者のみ）
-        Route::post('/register', [AuthController::class, 'register']);
-        Route::get('/admins', [AuthController::class, 'getAdmins']);
-        Route::put('/admins/{adminId}/status', [AuthController::class, 'updateAdminStatus']);
+        Route::middleware('super.admin')->group(function () {
+            Route::post('/register', [AuthController::class, 'register']);
+            Route::get('/admins', [AuthController::class, 'getAdmins']);
+            Route::put('/admins/{adminId}/status', [AuthController::class, 'updateAdminStatus']);
+        });
     });
 
     // 商品管理ルート

@@ -73,5 +73,6 @@ class Kernel extends HttpKernel
         // カスタムミドルウェア
         'check.permission' => \App\Http\Middleware\CheckPermission::class,
         'cors' => \App\Http\Middleware\Cors::class,
+        'super.admin' => \App\Http\Middleware\EnsureSuperAdmin::class,
     ];
 }
