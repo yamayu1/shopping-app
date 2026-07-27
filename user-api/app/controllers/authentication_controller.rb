@@ -59,7 +59,7 @@ class AuthenticationController < ApplicationController
     
     if user
       user.generate_password_reset_token
-      # UserMailer.password_reset(user).deliver_now
+      UserMailer.password_reset(user).deliver_now
     end
 
     # メールアドレスが存在しなくても同じレスポンスを返す

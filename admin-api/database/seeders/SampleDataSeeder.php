@@ -79,6 +79,7 @@ class SampleDataSeeder extends Seeder
                     'is_active' => 1,
                     'is_featured' => 0,
                     'low_stock_threshold' => 10,
+                    'images' => json_encode(['/images/placeholder.jpg']),
                     'created_at' => now(),
                     'updated_at' => now(),
                 ])

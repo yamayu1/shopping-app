@@ -63,19 +63,12 @@ class UserController extends Controller
     // ユーザー詳細取得
     public function show(int $id): JsonResponse
     {
-        try {
-            $user = User::findOrFail($id);
-            return response()->json([
-                'success' => true,
-                'message' => 'User retrieved',
-                'data' => $user
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found'
-            ], 404);
-        }
+        $user = User::findOrFail($id);
+        return response()->json([
+            'success' => true,
+            'message' => 'User retrieved',
+            'data' => $user
+        ]);
     }
 
     // ユーザーステータス更新

@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterAdminRequest;
+use App\Http\Requests\Auth\ChangePasswordRequest;
+use App\Http\Requests\Auth\UpdateProfileRequest;
+use App\Http\Requests\Auth\UpdateAdminStatusRequest;
 
 class AuthController extends Controller
 {
@@ -19,18 +24,9 @@ class AuthController extends Controller
     }
 
     // ログイン処理
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'email' => 'required|email',
-                'password' => 'required|string|min:8',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             $credentials = $request->only('email', 'password');
 
             $admin = Admin::where('email', $credentials['email'])->first();
@@ -54,32 +50,16 @@ class AuthController extends Controller
 
         } catch (JWTException $e) {
             \Log::error('JWT Login Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return $this->errorResponse('Could not create token', $e->getMessage(), 500);
+            return $this->errorResponse('Could not create token', null, 500);
         } catch (\Exception $e) {
             \Log::error('Login Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return $this->errorResponse('Login failed', $e->getMessage(), 500);
+            return $this->errorResponse('Login failed', null, 500);
         }
     }
 
-    public function register(Request $request): JsonResponse
+    public function register(RegisterAdminRequest $request): JsonResponse
     {
         try {
-            $currentAdmin = auth('admin')->user();
-            if (!$currentAdmin || !$currentAdmin->isSuperAdmin()) {
-                return $this->errorResponse('Unauthorized to create admin accounts', null, 403);
-            }
-
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:admins',
-                'password' => 'required|string|min:8|confirmed',
-                'role' => 'required|string|in:super_admin,admin,manager,editor',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             $admin = Admin::create([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -93,7 +73,8 @@ class AuthController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Registration failed', $e->getMessage(), 500);
+            \Log::error('Registration Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return $this->errorResponse('Registration failed', null, 500);
         }
     }
 
@@ -134,18 +115,9 @@ class AuthController extends Controller
         }
     }
 
-    public function changePassword(Request $request): JsonResponse
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'current_password' => 'required|string',
-                'new_password' => 'required|string|min:8|confirmed',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
-
             $admin = auth('admin')->user();
 
             if (!Hash::check($request->current_password, $admin->password)) {
@@ -159,23 +131,14 @@ class AuthController extends Controller
             return $this->successResponse('Password changed successfully', null);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to change password', $e->getMessage(), 500);
+            \Log::error('Change Password Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return $this->errorResponse('Failed to change password', null, 500);
         }
     }
 
-    public function updateProfile(Request $request): JsonResponse
+    public function updateProfile(UpdateProfileRequest $request): JsonResponse
     {
         $admin = auth('admin')->user();
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:admins,email,' . $admin->id,
-        ]);
-
-        if ($validator->fails()) {
-            return $this->errorResponse('Validation failed', $validator->errors(), 422);
-        }
-
         $admin->update($request->only(['name', 'email']));
 
         return $this->successResponse('Profile updated successfully', [
@@ -186,11 +149,6 @@ class AuthController extends Controller
     public function getAdmins(Request $request): JsonResponse
     {
         try {
-            $currentAdmin = auth('admin')->user();
-            if (!$currentAdmin || !$currentAdmin->isSuperAdmin()) {
-                return $this->errorResponse('Unauthorized to view admin accounts', null, 403);
-            }
-
             $query = Admin::query();
 
             if ($request->has('role')) {
@@ -223,25 +181,15 @@ class AuthController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to retrieve admins', $e->getMessage(), 500);
+            \Log::error('Get Admins Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return $this->errorResponse('Failed to retrieve admins', null, 500);
         }
     }
 
-    public function updateAdminStatus(Request $request, int $adminId): JsonResponse
+    public function updateAdminStatus(UpdateAdminStatusRequest $request, int $adminId): JsonResponse
     {
         try {
             $currentAdmin = auth('admin')->user();
-            if (!$currentAdmin || !$currentAdmin->isSuperAdmin()) {
-                return $this->errorResponse('Unauthorized to update admin accounts', null, 403);
-            }
-
-            $validator = Validator::make($request->all(), [
-                'is_active' => 'required|boolean',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->errorResponse('Validation failed', $validator->errors(), 422);
-            }
 
             $admin = Admin::findOrFail($adminId);
 
@@ -256,7 +204,8 @@ class AuthController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to update admin status', $e->getMessage(), 500);
+            \Log::error('Update Admin Status Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return $this->errorResponse('Failed to update admin status', null, 500);
         }
     }
 
