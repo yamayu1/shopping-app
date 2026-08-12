@@ -46,7 +46,7 @@ export const adminOrderService = {
     const response = await adminApiClient.get<any>(url);
     const apiData = response.data.data;
     return {
-      data: apiData.orders || [],
+      data: (apiData.orders || []).map((order: any) => ({...order,items: order.order_items ?? order.items ?? [],})),
       pagination: apiData.pagination || { current_page: 1, per_page: 10, total: 0, total_pages: 1 },
     };
   },
@@ -54,7 +54,8 @@ export const adminOrderService = {
   // 注文を注文番号で取得
   getOrderByNumber: async (orderNumber: string): Promise<Order> => {
     const response = await adminApiClient.get<any>(`/admin/orders/${orderNumber}`);
-    return response.data.data?.order;
+    const order = response.data.data?.order;
+    return order ? {...order, items: order.order_items ?? order.items ?? [] } : order;
   },
 
   // 注文ステータスを更新
