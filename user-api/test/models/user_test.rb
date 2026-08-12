@@ -54,4 +54,16 @@ class UserTest < ActiveSupport::TestCase
       assert user.valid?, "ネット不調時は登録を止めない設計のはず: #{user.errors.full_messages}"
     end
   end
+
+  def test_generate_email_confirmation_token
+    assert_nil @user.email_confirmation_token
+    @user.generate_email_confirmation_token
+    assert @user.email_confirmation_token.present?
+  end
+
+  def test_confirm_email_marks_as_verified
+    refute @user.email_verified?
+    @user.confirm_email!
+    assert @user.email_verified?
+  end
 end

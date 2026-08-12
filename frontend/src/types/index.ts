@@ -26,6 +26,7 @@ export interface User {
   is_active: boolean;
   order_count?: number;
   total_spent?: number;
+  email_verified?: boolean;
   created_at: string;
   updated_at: string;
 }

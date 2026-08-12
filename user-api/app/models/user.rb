@@ -51,6 +51,19 @@ class User < ApplicationRecord
     password_reset_expires_at < Time.current
   end
 
+  def generate_email_confirmation_token
+    self.email_confirmation_token = SecureRandom.urlsafe_base64
+    save
+  end
+
+  def confirm_email!
+    update!(email_verified_at: Time.current)
+  end
+
+  def email_verified?
+    email_verified_at.present?
+  end
+
   private
 
 
@@ -58,7 +71,7 @@ class User < ApplicationRecord
     return if email.blank?
 
     unless email_mx_valid?
-      errors.add(:email, 'のドメインはメールを受信できません')
+      errors.add(:email, "のドメインが正しくありません。\n受信できるメールアドレスを入力してください。")
     end
   rescue Timeout::Error, Resolv::ResolvError, SocketError => e
     Rails.logger.warn("MX確認をスキップしました: #{email} (#{e.class}: #{e.message})")

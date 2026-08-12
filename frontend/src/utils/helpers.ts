@@ -92,19 +92,19 @@ export const isValidImageFile = (file: File): boolean => {
 export const getErrorMessage = (error: any): string => {
   if (typeof error === 'string') return error;
 
-  // APIからのエラー
-  if (error?.response?.data?.message) {
-    return error.response.data.message;
-  }
-
-  // バリデーションエラー（配列で返ってくることがある）
-  if (error?.response?.data?.errors) {
-    let errors = error.response.data.errors;
-    let firstError = Object.values(errors)[0];
+  // バリデーションエラー（具体的な理由。あれば優先して表示）
+  const apiErrors = error?.response?.data?.errors;
+  if (apiErrors && Object.values(apiErrors).length > 0) {
+    let firstError = Object.values(apiErrors)[0];
     if (Array.isArray(firstError)) {
       return firstError[0] as string;
     }
     return firstError as string;
+  }
+
+  // APIからのエラー
+  if (error?.response?.data?.message) {
+    return error.response.data.message;
   }
 
   if (error?.message === 'Network Error') {
