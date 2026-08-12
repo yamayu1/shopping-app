@@ -10,6 +10,7 @@ gem 'jwt'
 gem 'rack-cors'
 gem 'kaminari'
 gem 'active_storage_validations'
+gem 'valid_email2'
 
 group :test do
   gem 'minitest'
