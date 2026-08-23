@@ -38,25 +38,17 @@ class UserController extends Controller
                           ->orderBy('created_at', 'desc')
                           ->paginate($request->get('per_page', 15));
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Users retrieved',
-                'data' => [
-                    'data' => $users->items(),
-                    'pagination' => [
-                        'current_page' => $users->currentPage(),
-                        'total_pages' => $users->lastPage(),
-                        'per_page' => $users->perPage(),
-                        'total' => $users->total(),
-                    ]
+            return $this->successResponse('Users retrieved', [
+                'data' => $users->items(),
+                'pagination' => [
+                    'current_page' => $users->currentPage(),
+                    'total_pages' => $users->lastPage(),
+                    'per_page' => $users->perPage(),
+                    'total' => $users->total(),
                 ]
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve users',
-                'errors' => $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Failed to retrieve users', $e->getMessage(), 500);
         }
     }
 
@@ -64,11 +56,8 @@ class UserController extends Controller
     public function show(int $id): JsonResponse
     {
         $user = User::findOrFail($id);
-        return response()->json([
-            'success' => true,
-            'message' => 'User retrieved',
-            'data' => $user
-        ]);
+
+        return $this->successResponse('User retrieved', $user);
     }
 
     // ユーザーステータス更新
@@ -78,16 +67,9 @@ class UserController extends Controller
             $user = User::findOrFail($id);
             $user->update(['is_active' => $request->boolean('is_active')]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'User status updated',
-                'data' => $user
-            ]);
+            return $this->successResponse('User status updated', $user);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update user status'
-            ], 500);
+            return $this->errorResponse('Failed to update user status', null, 500);
         }
     }
 
@@ -104,16 +86,9 @@ class UserController extends Controller
                     ->count(),
             ];
 
-            return response()->json([
-                'success' => true,
-                'message' => 'User statistics retrieved',
-                'data' => $stats
-            ]);
+            return $this->successResponse('User statistics retrieved', $stats);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve statistics'
-            ], 500);
+            return $this->errorResponse('Failed to retrieve statistics', null, 500);
         }
     }
 
@@ -125,16 +100,9 @@ class UserController extends Controller
                           ->orderBy('created_at', 'desc')
                           ->get();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'User orders retrieved',
-                'data' => $orders
-            ]);
+            return $this->successResponse('User orders retrieved', $orders);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve user orders'
-            ], 500);
+            return $this->errorResponse('Failed to retrieve user orders', null, 500);
         }
     }
 
@@ -145,15 +113,9 @@ class UserController extends Controller
             $user = User::findOrFail($id);
             $user->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'User deleted'
-            ]);
+            return $this->successResponse('User deleted');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete user'
-            ], 500);
+            return $this->errorResponse('Failed to delete user', null, 500);
         }
     }
 }
