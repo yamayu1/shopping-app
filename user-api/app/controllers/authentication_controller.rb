@@ -44,7 +44,7 @@ class AuthenticationController < ApplicationController
 
   def change_password
     unless current_user.authenticate(params[:current_password])
-      return render_error('現在のパスワードが正しくありません', :unauthorized)
+      return render_error('現在のパスワードが正しくありません', :unprocessable_entity)
     end
 
     if current_user.update(password: params[:new_password])
