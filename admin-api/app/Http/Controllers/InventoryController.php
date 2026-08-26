@@ -375,8 +375,8 @@ class InventoryController extends Controller
                         $product->stock_status,
                         $product->price,
                         $product->cost_price ?? 'N/A',
-                        number_format($totalCostValue, 2),
-                        number_format($totalRetailValue, 2),
+                        $totalCostValue,
+                        $totalRetailValue,
                         $product->updated_at->toDateTimeString(),
                     ]);
                 }

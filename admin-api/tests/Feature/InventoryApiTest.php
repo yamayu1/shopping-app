@@ -96,4 +96,22 @@ class InventoryApiTest extends TestCase
 
         $response->assertStatus(422);
     }
+
+    /** @test */
+    public function it_exports_inventory_without_thousand_separator(): void
+    {
+        Product::factory()->create([
+            'category_id'    => $this->category->id,
+            'stock_quantity' => 1000,
+            'price'          => 1000,
+            'cost_price'     => 1000,
+        ]);
+        $response = $this->actingAs($this->admin, 'admin')
+                        ->get('/api/admin/inventory/export');
+
+        $response->assertStatus(200);
+        $csv = $response->streamedContent();
+        $this->assertStringContainsString('1000000', $csv); 
+        $this->assertStringNotContainsString('1,000,000', $csv);
+    }  
 }
