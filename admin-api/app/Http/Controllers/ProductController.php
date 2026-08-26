@@ -324,9 +324,21 @@ class ProductController extends Controller
         ]);
     }
 
-    public function analytics(int $id): JsonResponse
+    public function analytics(Request $request, int $id): JsonResponse
     {
         try {
+            $validator = Validator::make($request->all(), [
+                'date_from' => 'nullable|date',
+                'date_to' => 'nullable|date|after_or_equal:date_from',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->errorResponse('Validation failed', $validator->errors(), 422);
+            }
+
+            $dateFrom = $request->get('date_from', now()->subDays(30)->toDateString());
+            $dateTo = $request->get('date_to', now()->toDateString());
+
             $product = Product::findOrFail($id);
 
             $analytics = [
@@ -340,10 +352,10 @@ class ProductController extends Controller
                 'conversion_rate' => 0,
             ];
 
-            // 直近30日間の売上推移を取得
+            // 指定期間の売上推移を取得（未指定なら直近30日）
             $salesOverTime = $product->orderItems()
                 ->select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(quantity) as quantity'), DB::raw('SUM(total) as revenue'))
-                ->where('created_at', '>=', now()->subDays(30))
+                ->whereBetween('created_at', [$dateFrom, $dateTo])
                 ->groupBy('date')
                 ->orderBy('date')
                 ->get();
@@ -351,7 +363,11 @@ class ProductController extends Controller
             return $this->successResponse('Product analytics retrieved successfully', [
                 'product' => $product->only(['id', 'name', 'sku']),
                 'analytics' => $analytics,
-                'sales_over_time' => $salesOverTime
+                'sales_over_time' => $salesOverTime,
+                'date_range' => [
+                    'from' => $dateFrom,
+                    'to' => $dateTo,
+                ],
             ]);
 
         } catch (\Exception $e) {
