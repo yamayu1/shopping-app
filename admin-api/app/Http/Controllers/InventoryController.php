@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\InventoryLog;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -393,49 +394,56 @@ class InventoryController extends Controller
     public function valuation(Request $request): JsonResponse
     {
         try {
-            $query = Product::active();
+            $baseQuery = Product::active();
 
             if ($request->has('category_id')) {
-                $query->byCategory($request->category_id);
+                $baseQuery->byCategory($request->category_id);
             }
 
-            $products = $query->get();
+            $totals = (clone $baseQuery)
+                ->selectRaw('COUNT(*) as total_products')
+                ->selectRaw('COALESCE(SUM(stock_quantity), 0) as total_stock_units')
+                ->selectRaw('COALESCE(SUM(stock_quantity * price), 0) as total_retail_value')
+                ->selectRaw('COALESCE(SUM(stock_quantity * cost_price), 0) as total_cost_value')
+                ->first();
+
+            $categoryRows = (clone $baseQuery)
+                ->selectRaw('category_id')
+                ->selectRaw('COUNT(*) as products_count')
+                ->selectRaw('COALESCE(SUM(stock_quantity), 0) as stock_units')
+                ->selectRaw('COALESCE(SUM(stock_quantity * price), 0) as retail_value')
+                ->selectRaw('COALESCE(SUM(stock_quantity * cost_price), 0) as cost_value')
+                ->groupBy('category_id')
+                ->get();
+
+            $categoryNames = Category::pluck('name', 'id');
+
+            $categories = [];
+            foreach ($categoryRows as $row) {
+                $name = $categoryNames->get($row->category_id, 'Uncategorized');
+                $categories[$name] = [
+                    'products_count' => (int) $row->products_count,
+                    'stock_units'    => (int) $row->stock_units,
+                    'cost_value'     => (float) $row->cost_value,
+                    'retail_value'   => (float) $row->retail_value,
+                ];
+            }
+
+            $totalRetailValue = (float) $totals->total_retail_value;
+            $totalCostValue   = (float) $totals->total_cost_value;
+            $potentialProfit  = $totalRetailValue - $totalCostValue;
 
             $valuation = [
-                'total_products' => $products->count(),
-                'total_stock_units' => $products->sum('stock_quantity'),
-                'total_cost_value' => 0,
-                'total_retail_value' => 0,
-                'categories' => []
+                'total_products'     => (int) $totals->total_products,
+                'total_stock_units'  => (int) $totals->total_stock_units,
+                'total_cost_value'   => $totalCostValue,
+                'total_retail_value' => $totalRetailValue,
+                'categories'         => $categories,
+                'potential_profit'   => $potentialProfit,
+                'profit_margin'      => $totalRetailValue > 0
+                    ? (($potentialProfit / $totalRetailValue) * 100)
+                    : 0,
             ];
-
-            foreach ($products as $product) {
-                $stockValue = $product->stock_quantity * $product->price;
-                $costValue = $product->cost_price ? $product->stock_quantity * $product->cost_price : 0;
-
-                $valuation['total_retail_value'] += $stockValue;
-                $valuation['total_cost_value'] += $costValue;
-
-                $categoryName = $product->category->name ?? 'Uncategorized';
-                if (!isset($valuation['categories'][$categoryName])) {
-                    $valuation['categories'][$categoryName] = [
-                        'products_count' => 0,
-                        'stock_units' => 0,
-                        'cost_value' => 0,
-                        'retail_value' => 0
-                    ];
-                }
-
-                $valuation['categories'][$categoryName]['products_count']++;
-                $valuation['categories'][$categoryName]['stock_units'] += $product->stock_quantity;
-                $valuation['categories'][$categoryName]['cost_value'] += $costValue;
-                $valuation['categories'][$categoryName]['retail_value'] += $stockValue;
-            }
-
-            $valuation['potential_profit'] = $valuation['total_retail_value'] - $valuation['total_cost_value'];
-            $valuation['profit_margin'] = $valuation['total_retail_value'] > 0 
-                ? (($valuation['potential_profit'] / $valuation['total_retail_value']) * 100) 
-                : 0;
 
             return $this->successResponse('Inventory valuation calculated successfully', [
                 'valuation' => $valuation
