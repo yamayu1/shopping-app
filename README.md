@@ -34,6 +34,9 @@ Amazon風のECサイトです。
 ## 起動方法
 
 ```bash
+# 環境変数ファイルを作成
+cp .env.example .env
+
 # ビルドして起動
 make setup
 

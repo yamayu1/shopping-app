@@ -34,6 +34,7 @@ clean:
 
 # プロジェクトのセットアップ（初回セットアップ）
 setup: build
+	cp -n .env.example .env 2>/dev/null || true
 	docker-compose up -d mysql redis
 	@echo "MySQLの起動を待機中..."
 	@sleep 15

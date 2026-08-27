@@ -3,10 +3,10 @@ services:
     image: mysql:8.0
     container_name: shopping_mysql
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: shopping_development
-      MYSQL_USER: shopping_user
-      MYSQL_PASSWORD: shopping_password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
@@ -15,7 +15,7 @@ services:
     networks:
       - shopping_network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -36,10 +36,11 @@ services:
       dockerfile: Dockerfile
     container_name: shopping_rails_api
     environment:
-      DATABASE_URL: mysql2://shopping_user:shopping_password@mysql:3306/shopping_development
+      DATABASE_URL: mysql2://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}
       REDIS_URL: redis://redis:6379/0
       RAILS_ENV: development
-      CORS_ALLOWED_ORIGINS: https://localhost
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE} 
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       APP_HOST: ${APP_HOST}
@@ -82,14 +83,14 @@ services:
       DB_CONNECTION: mysql
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_DATABASE: shopping_development
-      DB_USERNAME: shopping_user
-      DB_PASSWORD: shopping_password
+      DB_DATABASE: ${MYSQL_DATABASE}
+      DB_USERNAME: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       APP_ENV: local
       APP_DEBUG: "true"
-      CORS_ALLOWED_ORIGINS: https://localhost
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
     ports:
       - "8000:8000"
     volumes:
@@ -144,7 +145,11 @@ services:
       dockerfile: Dockerfile
     container_name: shopping_scheduler
     environment:
-      DATABASE_URL: mysql2://shopping_user:shopping_password@mysql:3306/shopping_development
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USERNAME: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_DATABASE: ${MYSQL_DATABASE}
     volumes:
       - ./scheduler:/app
       - ./exports:/app/exports
