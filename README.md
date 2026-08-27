@@ -49,7 +49,7 @@ docker-compose up --build
 ### テスト用アカウント
 
 - ユーザー: user@example.com / password123
-- 管理者: admin@example.com / admin123
+- 管理者: admin@example.com / password123
 
 ## 開発コマンド
 
