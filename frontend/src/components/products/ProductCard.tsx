@@ -88,9 +88,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           {product.description}
         </Typography>
 
-        <Typography variant="h6" color="primary" sx={{ fontWeight: 600 }}>
-          {formatCurrency(product.price)}
-        </Typography>
+        {product.sale_price && product.sale_price < product.price ? (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="h6" color="error" sx={{ fontWeight: 600 }}>
+              {formatCurrency(product.sale_price)}
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ textDecoration: 'line-through' }}
+            >
+              {formatCurrency(product.price)}
+            </Typography>
+          </Box>
+        ) : (
+          <Typography variant="h6" color="primary" sx={{ fontWeight: 600 }}>
+            {formatCurrency(product.price)}
+          </Typography>
+        )}
 
         <Typography
           variant="caption"

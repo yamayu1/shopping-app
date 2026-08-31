@@ -41,6 +41,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  sale_price?: number | null;
   category_id: number;
   category?: Category;
   sku: string;
@@ -56,6 +57,7 @@ export interface ProductForm {
   name: string;
   description: string;
   price: number;
+  sale_price?: number | null;
   stock_quantity: number;
   category_id: number;
   sku?: string;

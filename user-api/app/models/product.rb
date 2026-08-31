@@ -21,6 +21,14 @@ class Product < ApplicationRecord
     stock_quantity > 0 && active?
   end
 
+  def on_sale?
+    sale_price.present? && sale_price < price
+  end
+
+  def effective_price
+    on_sale? ? sale_price : price
+  end
+
   def can_purchase?(quantity)
     in_stock? && stock_quantity >= quantity
   end

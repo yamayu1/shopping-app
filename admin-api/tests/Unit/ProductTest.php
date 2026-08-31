@@ -76,6 +76,18 @@ class ProductTest extends TestCase
     }
 
     /** @test */
+    public function profit_margin_uses_sale_price_when_on_sale(): void
+    {
+        $product = Product::factory()->make([
+            'price' => 1000,
+            'sale_price' => 700,
+            'cost_price' => 600,
+        ]);
+
+        $this->assertEqualsWithDelta(14.29, $product->getProfitMargin(), 0.01);
+    }
+
+    /** @test */
     public function it_is_not_on_sale_when_sale_price_is_null(): void
     {
         $product = Product::factory()->create([

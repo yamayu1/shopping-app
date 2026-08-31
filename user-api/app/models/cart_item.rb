@@ -7,7 +7,7 @@ class CartItem < ApplicationRecord
   validate :sufficient_stock
 
   def subtotal
-    product.price * quantity
+    product.effective_price * quantity
   end
 
   private

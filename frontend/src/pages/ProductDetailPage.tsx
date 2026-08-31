@@ -232,7 +232,18 @@ const ProductDetailPage: React.FC = () => {
 
             {/* 価格 */}
             <Typography variant="h4" color="primary" sx={{ fontWeight: 700, mb: 3 }}>
-              {formatCurrency(product.price)}
+              {product.sale_price && product.sale_price < product.price ? (
+                <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+                  <span style={{ color: '#d32f2f' }}>
+                    {formatCurrency(product.sale_price)}
+                  </span>
+                  <span style={{ textDecoration: 'line-through', color: '#888', fontSize: '0.7em' }}>
+                    {formatCurrency(product.price)}
+                  </span>
+                </Box>
+              ) : (
+                formatCurrency(product.price)
+              )}
             </Typography>
 
             <Divider sx={{ mb: 3 }} />

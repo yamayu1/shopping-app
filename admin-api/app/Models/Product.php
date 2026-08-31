@@ -165,6 +165,7 @@ class Product extends Model implements AuditableContract
 
     public function getProfitMargin(): float
     {
+        $price = $this->effective_price;
         if (!$this->cost_price || $this->price <= 0) {
             return 0;
         }

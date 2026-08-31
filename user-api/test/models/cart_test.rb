@@ -21,4 +21,13 @@ class CartTest < ActiveSupport::TestCase
     @cart.add_item(product2, 1)
     assert_equal 1300, @cart.total_price
   end
+
+  def test_total_price_uses_sale_price
+    user = create(:user)
+    cart = create(:cart, user: user)
+    product = create(:product, price: 1000, sale_price: 800, stock_quantity: 10)
+    cart.add_item(product, 2)
+
+    assert_equal 1600, cart.total_price
+  end
 end
