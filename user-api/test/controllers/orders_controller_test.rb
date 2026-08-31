@@ -32,4 +32,25 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
     data = json_response
     assert_equal true, data[:success]
   end
+  
+  def test_cancel_order_success
+    order = create(:order, user: @user, address: @address)
+
+    put "/api/orders/#{order.id}/cancel", headers: @headers
+
+    assert_equal 200, response.status
+    data = json_response
+    assert_equal true, data[:success]
+    assert_equal 'cancelled', order.reload.status
+  end
+
+  def test_cancel_order_fails_when_shipped
+    order = create(:order, :shipped, user: @user, address: @address)
+
+    put "/api/orders/#{order.id}/cancel", headers: @headers
+
+    assert_equal 400, response.status
+    data = json_response
+    assert_equal false, data[:success]
+  end
 end
