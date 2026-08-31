@@ -76,4 +76,42 @@ class AuthenticationControllerTest < ActionDispatch::IntegrationTest
 
     assert @user.reload.authenticate('Password123!')
   end
+
+  def test_register_sends_confirmation_email
+    assert_difference 'ActionMailer::Base.deliveries.size', 1 do
+      post '/api/auth/register', params: {
+        first_name: 'Hanako',
+        last_name: 'Suzuki',
+        email: 'confirm-test@example.com',
+        phone: '090-1234-5678',
+        password: 'SecurePass123!',
+        password_confirmation: 'SecurePass123!'
+      }.to_json, headers: { 'Content-Type' => 'application/json' }
+    end
+    assert_equal 201, response.status
+  end
+
+  def test_verify_email_with_valid_token
+    @user.generate_email_confirmation_token
+    get "/api/auth/verify_email?token=#{@user.email_confirmation_token}"
+
+    assert_response :redirect
+    assert @user.reload.email_verified?
+  end
+
+  def test_verify_email_when_already_verified
+    @user.generate_email_confirmation_token
+    @user.confirm_email!
+    get "/api/auth/verify_email?token=#{@user.email_confirmation_token}"
+
+    assert_response :redirect
+    assert_match 'status=already', response.location
+  end
+
+  def test_verify_email_with_invalid_token
+    get '/api/auth/verify_email?token=invalidtoken123'
+
+    assert_response :redirect
+    assert_match 'status=error', response.location
+  end
 end
