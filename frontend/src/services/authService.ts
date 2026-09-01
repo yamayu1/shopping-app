@@ -33,6 +33,7 @@ const toAuthUser = (apiResponse: any): AuthUser => {
     phone: apiData.phone || '',
     role: apiData.role || 'user',
     is_active: true,
+    email_verified: apiData.email_verified ?? false,
     created_at: apiData.created_at || new Date().toISOString(),
     updated_at: apiData.updated_at || new Date().toISOString(),
   };

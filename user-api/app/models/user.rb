@@ -1,3 +1,6 @@
+require 'timeout'
+require 'resolv'
+
 class User < ApplicationRecord
   has_secure_password
 
@@ -6,7 +9,8 @@ class User < ApplicationRecord
   has_one :cart, dependent: :destroy
   
   validates :email, presence: true, uniqueness: { case_sensitive: false }
-  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP } # validate email format
+  validates :email, 'valid_email_2/email': true
+  validate  :email_domain_receivable
   validates :first_name, :last_name, presence: true
   validates :phone, presence: true, format: { with: /\A[\d\-\(\)\+\s]{10,15}\z/, message: 'は正しい形式で入力してください（10〜15桁）' }
   
@@ -54,7 +58,38 @@ class User < ApplicationRecord
     end
   end
 
+  def generate_email_confirmation_token
+    self.email_confirmation_token = SecureRandom.urlsafe_base64
+    save
+  end
+
+  def confirm_email!
+    update!(email_verified_at: Time.current)
+  end
+
+  def email_verified?
+    email_verified_at.present?
+  end
+
   private
+
+
+  def email_domain_receivable
+    return if email.blank?
+
+    unless email_mx_valid?
+      errors.add(:email, "のドメインが正しくありません。\n受信できるメールアドレスを入力してください。")
+    end
+  rescue Timeout::Error, Resolv::ResolvError, SocketError => e
+    Rails.logger.warn("MX確認をスキップしました: #{email} (#{e.class}: #{e.message})")
+  end
+
+  def email_mx_valid?
+    return true if Rails.env.test?
+    Timeout.timeout(5) do
+      ValidEmail2::Address.new(email).valid_mx?
+    end
+  end
 
   def create_cart
     Cart.create(user: self)

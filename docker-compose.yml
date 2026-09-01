@@ -39,12 +39,20 @@ services:
       DATABASE_URL: mysql2://shopping_user:shopping_password@mysql:3306/shopping_development
       REDIS_URL: redis://redis:6379/0
       RAILS_ENV: development
+      CORS_ALLOWED_ORIGINS: https://localhost
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      APP_HOST: ${APP_HOST}
+      APP_PORT: ${APP_PORT}
+      APP_PROTOCOL: ${APP_PROTOCOL}
     ports:
       - "3001:3000"
     depends_on:
       mysql:
         condition: service_healthy
       redis:
+        condition: service_started
+      mailpit:
         condition: service_started
     networks:
       - shopping_network
@@ -55,6 +63,15 @@ services:
         bundle exec rails db:seed || true &&
         bundle exec rails server -b 0.0.0.0 -p 3000
       "
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: shopping_mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - shopping_network
 
   laravel_admin:
     build:
@@ -72,6 +89,7 @@ services:
       REDIS_PORT: 6379
       APP_ENV: local
       APP_DEBUG: "true"
+      CORS_ALLOWED_ORIGINS: https://localhost
     ports:
       - "8000:8000"
     volumes:
@@ -111,8 +129,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - REACT_APP_USER_API_URL=http://localhost:3001
-      - REACT_APP_ADMIN_API_URL=http://localhost:8000
+      - REACT_APP_USER_API_URL=https://localhost/api
+      - REACT_APP_ADMIN_API_URL=https://localhost/admin
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -132,6 +150,21 @@ services:
       - ./exports:/app/exports
     depends_on:
       - mysql
+    networks:
+      - shopping_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: shopping_nginx
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - rails_api
+      - laravel_admin
+      - frontend
     networks:
       - shopping_network
 

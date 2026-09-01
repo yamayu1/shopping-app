@@ -61,6 +61,7 @@ products.each do |product_data|
     product.stock_quantity = product_data[:stock_quantity]
     product.category = product_data[:category]
     product.is_active = true
+    product.images = ['/images/placeholder.jpg'].to_json
   end
 end
 

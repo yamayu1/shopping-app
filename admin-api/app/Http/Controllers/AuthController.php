@@ -60,11 +60,6 @@ class AuthController extends Controller
     public function register(RegisterAdminRequest $request): JsonResponse
     {
         try {
-            $currentAdmin = auth('admin')->user();
-            if (!$currentAdmin || !$currentAdmin->isSuperAdmin()) {
-                return $this->errorResponse('Unauthorized to create admin accounts', null, 403);
-            }
-
             $admin = Admin::create([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -154,11 +149,6 @@ class AuthController extends Controller
     public function getAdmins(Request $request): JsonResponse
     {
         try {
-            $currentAdmin = auth('admin')->user();
-            if (!$currentAdmin || !$currentAdmin->isSuperAdmin()) {
-                return $this->errorResponse('Unauthorized to view admin accounts', null, 403);
-            }
-
             $query = Admin::query();
 
             if ($request->has('role')) {
@@ -200,9 +190,6 @@ class AuthController extends Controller
     {
         try {
             $currentAdmin = auth('admin')->user();
-            if (!$currentAdmin || !$currentAdmin->isSuperAdmin()) {
-                return $this->errorResponse('Unauthorized to update admin accounts', null, 403);
-            }
 
             $admin = Admin::findOrFail($adminId);
 

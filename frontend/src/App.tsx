@@ -20,6 +20,7 @@ import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import EmailVerifiedPage from './pages/EmailVerifiedPage';
 import AdminLoginForm from './components/admin/AdminLoginForm';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
@@ -56,6 +57,7 @@ const App: React.FC = () => {
                 <Route path="/register" element={<RegisterForm />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/email-verified" element={<EmailVerifiedPage />} />
                 <Route path="/admin/login" element={<AdminLoginForm />} />
 
                 {/* ログインが必要なページ */}
