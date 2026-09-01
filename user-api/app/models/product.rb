@@ -37,6 +37,12 @@ class Product < ApplicationRecord
     end
   end
 
+  def restore_stock(quantity)
+    with_lock do
+      increment!(:stock_quantity, quantity)
+    end
+  end
+
   def main_image
     return nil unless images.is_a?(Array) && images.any?
     images.first

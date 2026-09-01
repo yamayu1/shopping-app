@@ -39,8 +39,7 @@ class Order < ApplicationRecord
 
     transaction do
       order_items.each do |item|
-        product = item.product
-        product.increment!(:stock_quantity, item.quantity)
+        item.product.restore_stock(item.quantity)
       end
 
       update!(status: :cancelled)

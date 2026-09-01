@@ -51,6 +51,13 @@ class User < ApplicationRecord
     password_reset_expires_at < Time.current
   end
 
+  def set_default_address(address)
+    transaction do
+      addresses.update_all(is_default: false)
+      address.update!(is_default: true)
+    end
+  end
+
   def generate_email_confirmation_token
     self.email_confirmation_token = SecureRandom.urlsafe_base64
     save
