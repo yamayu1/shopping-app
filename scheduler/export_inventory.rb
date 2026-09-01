@@ -52,6 +52,11 @@ begin
   timestamp = Time.now.strftime('%Y%m%d_%H%M%S')
   csv_filename = "/app/exports/inventory_report_#{timestamp}.csv"
 
+  # データ行
+  total_inventory_value = 0
+  low_stock_count = 0
+  out_of_stock_count = 0
+
   # CSVファイルに書き込み
   CSV.open(csv_filename, 'w') do |csv|
     # ヘッダー
@@ -68,11 +73,6 @@ begin
       '作成日時',
       '最終更新日時'
     ]
-
-    # データ行
-    total_inventory_value = 0
-    low_stock_count = 0
-    out_of_stock_count = 0
 
     results.each do |row|
       stock_status = row['stock_status']
