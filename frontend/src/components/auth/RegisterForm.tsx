@@ -122,11 +122,11 @@ const RegisterForm: React.FC = () => {
         </Typography>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
+          <Alert severity="error" sx={{ mb: 3, whiteSpace: 'pre-line' }}>
             {error}
           </Alert>
         )}
-
+        
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>

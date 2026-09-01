@@ -1,5 +1,5 @@
 class AuthenticationController < ApplicationController
-  skip_before_action :authenticate_user!, only: [:login, :register, :forgot_password, :reset_password]
+  skip_before_action :authenticate_user!, only: [:login, :register, :forgot_password, :reset_password, :verify_email]
 
   def login
     # メールアドレスでユーザーを検索
@@ -21,6 +21,8 @@ class AuthenticationController < ApplicationController
     user = User.new(user_params)
     
     if user.save
+      user.generate_email_confirmation_token
+      UserMailer.email_confirmation(user).deliver_now
       token = generate_jwt_token(user)
       
       render_success({
@@ -85,6 +87,19 @@ class AuthenticationController < ApplicationController
     end
   end
 
+  def verify_email
+    user = User.active.find_by(email_confirmation_token: params[:token])
+
+    if user.nil?
+      redirect_to 'https://localhost/email-verified?status=error', allow_other_host: true
+    elsif user.email_verified?
+      redirect_to 'https://localhost/email-verified?status=already', allow_other_host: true
+    else
+      user.confirm_email!
+      redirect_to 'https://localhost/email-verified?status=success', allow_other_host: true
+    end
+  end
+
   private
 
   def user_params
@@ -100,6 +115,7 @@ class AuthenticationController < ApplicationController
       full_name: user.full_name,
       phone: user.phone,
       birth_date: user.birth_date,
+      email_verified: user.email_verified?,
       created_at: user.created_at
     }
   end

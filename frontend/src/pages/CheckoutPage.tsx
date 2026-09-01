@@ -27,11 +27,13 @@ import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import { addressService, CreateAddressData } from '../services/addressService';
 import { orderService, CreateOrderData } from '../services/orderService';
 import { Address } from '../types';
 import { formatCurrency } from '../utils/helpers';
 import { ROUTES, VALIDATION_RULES } from '../utils/constants';
+
 
 const steps = ['配送先情報', '支払い方法', '注文確認'];
 
@@ -50,6 +52,7 @@ const addressSchema = yup.object({
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const { cart, totalAmount, clearCart, isLoading: cartLoading } = useCart();
+  const { user } = useAuth();
   const [activeStep, setActiveStep] = useState(0);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedShippingAddress, setSelectedShippingAddress] = useState<number | 'new'>('new');
@@ -164,6 +167,12 @@ const CheckoutPage: React.FC = () => {
         <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 600, mb: 4 }}>
           購入手続き
         </Typography>
+
+        {user && !user.email_verified && (
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            メールアドレスが未確認です。確認が完了していないと、注文確認メールが届かない場合があります。登録時にお送りした確認メールのリンクから確認をお願いします。
+          </Alert>
+        )}
 
         {error && (
           <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>

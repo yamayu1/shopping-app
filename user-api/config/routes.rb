@@ -13,6 +13,7 @@ Rails.application.routes.draw do
     post 'auth/change-password', to: 'authentication#change_password'
     post 'auth/forgot_password', to: 'authentication#forgot_password'
     post 'auth/reset_password', to: 'authentication#reset_password'
+    get  'auth/verify_email', to: 'authentication#verify_email'
 
     # 商品
     resources :products, only: [:index, :show] do

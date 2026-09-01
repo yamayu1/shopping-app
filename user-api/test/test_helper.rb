@@ -10,6 +10,7 @@ end
 
 require_relative '../config/environment'
 require 'rails/test_help'
+require 'minitest/mock'
 require 'factory_bot_rails'
 
 class ActiveSupport::TestCase

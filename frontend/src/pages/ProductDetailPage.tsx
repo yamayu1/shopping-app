@@ -26,15 +26,16 @@ import {
 } from '@mui/icons-material';
 import { Product } from '../types';
 import { productService } from '../services/productService';
-import { cartService } from '../services/cartService';
 import { formatCurrency, getImageUrl } from '../utils/helpers';
 import { ROUTES } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { addToCart } = useCart();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,10 +76,11 @@ const ProductDetailPage: React.FC = () => {
 
     try {
       setAddingToCart(true);
-      await cartService.addItem(product.id, quantity);
+      await addToCart(product.id, quantity);
       setError(null);
-      // 成功メッセージを表示
-      alert('カートに追加しました');
+      navigate(ROUTES.CART);
+      // // 成功メッセージを表示
+      // alert('カートに追加しました');
     } catch (err: any) {
       console.error('カート追加エラー:', err);
       setError('カートへの追加に失敗しました');

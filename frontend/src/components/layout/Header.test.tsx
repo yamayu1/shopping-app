@@ -4,8 +4,10 @@ import { BrowserRouter } from 'react-router-dom';
 import Header from './Header';
 import { useAuth } from '../../contexts/AuthContext';
 import { adminAuthService } from '../../services/adminAuthService';
+import { useCart } from '../../contexts/CartContext';
 
 jest.mock('../../contexts/AuthContext');
+jest.mock('../../contexts/CartContext');
 jest.mock('../../services/adminAuthService', () => ({
   adminAuthService: {
     isAuthenticated: jest.fn().mockReturnValue(false),
@@ -21,6 +23,7 @@ jest.mock('../../services/adminAuthService', () => ({
 }));
 
 const mockedUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockedUseCart = useCart as jest.MockedFunction<typeof useCart>;
 
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
@@ -53,8 +56,20 @@ describe('Header', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (adminAuthService.isAuthenticated as jest.Mock).mockReturnValue(false);
+    mockedUseCart.mockReturnValue({           
+      cart: null,
+      itemCount: 0,
+      totalAmount: 0,
+      isLoading: false,
+      error: null,
+      loadCart: jest.fn(),
+      addToCart: jest.fn(),
+      updateQuantity: jest.fn(),
+      removeItem: jest.fn(),
+      clearCart: jest.fn(),
+      clearError: jest.fn(),
+    });                                           
   });
-
   it('renders the app logo', () => {
     mockedUseAuth.mockReturnValue(defaultAuthState);
     renderHeader();

@@ -19,10 +19,12 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { adminAuthService } from '../../services/adminAuthService';
+import { useCart } from '../../contexts/CartContext';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { itemCount } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -81,7 +83,7 @@ const Header: React.FC = () => {
 
           {/* カートアイコン */}
           <IconButton color="inherit" component={Link} to="/cart">
-            <Badge badgeContent={0} color="secondary">
+            <Badge badgeContent={itemCount} color="error">
               <ShoppingCart />
             </Badge>
           </IconButton>
