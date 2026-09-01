@@ -50,7 +50,7 @@ describe('RegisterForm', () => {
     expect(screen.getByLabelText(/メールアドレス/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/電話番号/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^パスワード$/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/パスワード確認/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^パスワード確認$/i)).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /アカウント作成/i })
     ).toBeInTheDocument();
@@ -85,7 +85,7 @@ describe('RegisterForm', () => {
     const passwordInput = screen.getByLabelText(/^パスワード$/i);
     await userEvent.type(passwordInput, 'password123');
 
-    const confirmInput = screen.getByLabelText(/パスワード確認/i);
+    const confirmInput = screen.getByLabelText(/^パスワード確認$/i);
     await userEvent.type(confirmInput, 'different123');
 
     const submitButton = screen.getByRole('button', { name: /アカウント作成/i });
@@ -113,7 +113,7 @@ describe('RegisterForm', () => {
     );
     await userEvent.type(screen.getByLabelText(/電話番号/i), '090-1234-5678');
     await userEvent.type(screen.getByLabelText(/^パスワード$/i), 'password123');
-    await userEvent.type(screen.getByLabelText(/パスワード確認/i), 'password123');
+    await userEvent.type(screen.getByLabelText(/^パスワード確認$/i), 'password123');
 
     fireEvent.click(screen.getByRole('button', { name: /アカウント作成/i }));
 
@@ -148,7 +148,7 @@ describe('RegisterForm', () => {
     );
     await userEvent.type(screen.getByLabelText(/電話番号/i), '090-1234-5678');
     await userEvent.type(screen.getByLabelText(/^パスワード$/i), 'password123');
-    await userEvent.type(screen.getByLabelText(/パスワード確認/i), 'password123');
+    await userEvent.type(screen.getByLabelText(/^パスワード確認$/i), 'password123');
 
     fireEvent.click(screen.getByRole('button', { name: /アカウント作成/i }));
 

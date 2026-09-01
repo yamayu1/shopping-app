@@ -42,7 +42,7 @@ describe('LoginForm', () => {
 
     expect(screen.getByRole('heading', { name: 'ログイン' })).toBeInTheDocument();
     expect(screen.getByLabelText(/メールアドレス/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/パスワード/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^パスワード$/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /ログイン/i })).toBeInTheDocument();
   });
 
@@ -84,7 +84,7 @@ describe('LoginForm', () => {
     const emailInput = screen.getByLabelText(/メールアドレス/i);
     await userEvent.type(emailInput, 'test@example.com');
 
-    const passwordInput = screen.getByLabelText(/パスワード/i);
+    const passwordInput = screen.getByLabelText(/^パスワード$/i);
     await userEvent.type(passwordInput, 'password123');
 
     const submitButton = screen.getByRole('button', { name: /ログイン/i });
@@ -112,7 +112,7 @@ describe('LoginForm', () => {
     const emailInput = screen.getByLabelText(/メールアドレス/i);
     await userEvent.type(emailInput, 'test@example.com');
 
-    const passwordInput = screen.getByLabelText(/パスワード/i);
+    const passwordInput = screen.getByLabelText(/^パスワード$/i);
     await userEvent.type(passwordInput, 'password123');
 
     const submitButton = screen.getByRole('button', { name: /ログイン/i });

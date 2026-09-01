@@ -29,11 +29,15 @@ api.interceptors.request.use(
   }
 );
 
-// 401の場合はログイン画面にリダイレクト
+const SKIP_AUTH_REDIRECT_PATHS = ['/auth/change-password'];
+// 401（認証切れ）の場合はログイン画面にリダイレクト
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
+    const requestUrl = error.config?.url || '';
+    const shouldSkip = SKIP_AUTH_REDIRECT_PATHS.some((path) => requestUrl.includes(path));
+
+    if (error.response && error.response.status === 401 && !shouldSkip) {
       localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.USER_DATA);
       // ログインページにいる場合はリダイレクトしない（無限ループ防止）

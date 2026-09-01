@@ -106,10 +106,10 @@ test.describe('ユーザー購入フロー', () => {
       const passwordInput = page.locator('input[name="password"]');
       await expect(passwordInput).toHaveAttribute('type', 'password');
 
-      await page.click('button:has-text("パスワードを表示")');
+      await page.click('button[aria-label="パスワードを表示する"]');
       await expect(passwordInput).toHaveAttribute('type', 'text');
 
-      await page.click('button:has-text("パスワードを非表示")');
+      await page.click('button[aria-label="パスワードを非表示にする"]');
       await expect(passwordInput).toHaveAttribute('type', 'password');
     });
 
@@ -138,7 +138,7 @@ test.describe('ユーザー購入フロー', () => {
     test('ログインページが表示される', async ({ page }) => {
       await page.goto('/login');
       await expect(page.locator('text=ログイン').first()).toBeVisible();
-      await expect(page.locator('text=お帰りなさい！アカウントにログインしてください。')).toBeVisible();
+      await expect(page.locator('text=アカウントにログインしてください。')).toBeVisible();
     });
 
     test('バリデーションエラーが表示される（空フォーム送信）', async ({ page }) => {
@@ -153,7 +153,7 @@ test.describe('ユーザー購入フロー', () => {
       const passwordInput = page.locator('input[name="password"]');
       await expect(passwordInput).toHaveAttribute('type', 'password');
 
-      await page.click('button:has-text("パスワードを表示")');
+      await page.click('button[aria-label="パスワードを表示する"]');
       await expect(passwordInput).toHaveAttribute('type', 'text');
     });
 

@@ -77,6 +77,36 @@ class AuthenticationControllerTest < ActionDispatch::IntegrationTest
     assert @user.reload.authenticate('Password123!')
   end
 
+  def test_change_password_with_valid_current_password
+    post '/api/auth/change-password', params: {
+      current_password: 'Password123!',
+      new_password: 'NewPassword456!'
+    }.to_json, headers: auth_header(@user).merge('Content-Type' => 'application/json')
+
+    assert_equal 200, response.status
+    assert @user.reload.authenticate('NewPassword456!')
+  end
+
+  def test_change_password_with_wrong_current_password_returns_422
+    post '/api/auth/change-password', params: {
+      current_password: 'WrongPassword',
+      new_password: 'NewPassword456!'
+    }.to_json, headers: auth_header(@user).merge('Content-Type' => 'application/json')
+
+    assert_equal 422, response.status
+    assert_equal '現在のパスワードが正しくありません', json_response[:message]
+    assert @user.reload.authenticate('Password123!')
+  end
+
+  def test_change_password_without_auth_returns_401
+    post '/api/auth/change-password', params: {
+      current_password: 'Password123!',
+      new_password: 'NewPassword456!'
+    }.to_json, headers: { 'Content-Type' => 'application/json' }
+
+    assert_equal 401, response.status
+  end
+
   def test_register_sends_confirmation_email
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       post '/api/auth/register', params: {

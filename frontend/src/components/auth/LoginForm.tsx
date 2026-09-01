@@ -11,7 +11,10 @@ import {
   Checkbox,
   Divider,
   CircularProgress,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -127,22 +130,27 @@ const LoginForm: React.FC = () => {
             helperText={errors.password?.message as string}
             margin="normal"
             disabled={isLoading}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                    disabled={isLoading}
+                    aria-label={showPassword ? 'パスワードを非表示にする' : 'パスワードを表示する'}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+          <Box sx={{ mt: 2 }}>
             <FormControlLabel
               control={<Checkbox {...register('remember_me')} disabled={isLoading} />}
               label="ログイン状態を保持"
             />
-            <Button
-              type="button"
-              variant="text"
-              size="small"
-              onClick={() => setShowPassword(!showPassword)}
-              disabled={isLoading}
-            >
-              パスワードを{showPassword ? '非表示' : '表示'}
-            </Button>
           </Box>
 
           <Button

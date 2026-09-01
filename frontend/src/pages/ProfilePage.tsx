@@ -12,11 +12,12 @@ import {
   Alert,
   Divider,
   IconButton,
+  InputAdornment,
   Card,
   CardContent,
   Stack,
 } from '@mui/material';
-import { Add, Delete, Edit } from '@mui/icons-material';
+import { Add, Delete, Edit, Visibility, VisibilityOff } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -71,6 +72,9 @@ const ProfilePage: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const profileForm = useForm({
     resolver: yupResolver(profileSchema),
@@ -163,7 +167,7 @@ const ProfilePage: React.FC = () => {
       setSuccess('パスワードを変更しました');
       passwordForm.reset();
     } catch (err: any) {
-      setError('パスワードの変更に失敗しました');
+      setError(err.response?.data?.message || 'パスワードの変更に失敗しました');
     } finally {
       setLoading(false);
     }
@@ -556,10 +560,24 @@ const ProfilePage: React.FC = () => {
                       <TextField
                         {...field}
                         label="現在のパスワード"
-                        type="password"
+                        type={showCurrentPassword ? 'text' : 'password'}
+                        autoComplete="current-password"
                         fullWidth
                         error={!!passwordForm.formState.errors.current_password}
                         helperText={passwordForm.formState.errors.current_password?.message}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                edge="end"
+                                aria-label={showCurrentPassword ? '現在のパスワードを非表示にする' : '現在のパスワードを表示する'}
+                              >
+                                {showCurrentPassword ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
                       />
                     )}
                   />
@@ -572,10 +590,24 @@ const ProfilePage: React.FC = () => {
                       <TextField
                         {...field}
                         label="新しいパスワード"
-                        type="password"
+                        type={showNewPassword ? 'text' : 'password'}
+                        autoComplete="new-password"
                         fullWidth
                         error={!!passwordForm.formState.errors.new_password}
                         helperText={passwordForm.formState.errors.new_password?.message}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                edge="end"
+                                aria-label={showNewPassword ? '新しいパスワードを非表示にする' : '新しいパスワードを表示する'}
+                              >
+                                {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
                       />
                     )}
                   />
@@ -588,10 +620,24 @@ const ProfilePage: React.FC = () => {
                       <TextField
                         {...field}
                         label="新しいパスワード（確認）"
-                        type="password"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        autoComplete="new-password"
                         fullWidth
                         error={!!passwordForm.formState.errors.new_password_confirmation}
                         helperText={passwordForm.formState.errors.new_password_confirmation?.message}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                edge="end"
+                                aria-label={showConfirmPassword ? '新しいパスワード（確認）を非表示にする' : '新しいパスワード（確認）を表示する'}
+                              >
+                                {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
                       />
                     )}
                   />

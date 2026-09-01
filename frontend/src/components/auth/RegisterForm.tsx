@@ -10,7 +10,10 @@ import {
   Divider,
   CircularProgress,
   Grid,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -184,6 +187,20 @@ const RegisterForm: React.FC = () => {
             helperText={errors.password?.message as string}
             margin="normal"
             disabled={isLoading}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                    disabled={isLoading}
+                    aria-label={showPassword ? 'パスワードを非表示にする' : 'パスワードを表示する'}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
           <TextField
@@ -196,28 +213,21 @@ const RegisterForm: React.FC = () => {
             helperText={errors.password_confirmation?.message as string}
             margin="normal"
             disabled={isLoading}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    edge="end"
+                    disabled={isLoading}
+                    aria-label={showConfirmPassword ? 'パスワード確認を非表示にする' : 'パスワード確認を表示する'}
+                  >
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
-
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-            <Button
-              type="button"
-              variant="text"
-              size="small"
-              onClick={() => setShowPassword(!showPassword)}
-              disabled={isLoading}
-            >
-              パスワードを{showPassword ? '非表示' : '表示'}
-            </Button>
-            <Button
-              type="button"
-              variant="text"
-              size="small"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              disabled={isLoading}
-            >
-              確認パスワードを{showConfirmPassword ? '非表示' : '表示'}
-            </Button>
-          </Box>
 
           <Button
             type="submit"
