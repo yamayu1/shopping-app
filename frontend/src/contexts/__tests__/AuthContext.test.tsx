@@ -1,10 +1,10 @@
 import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { AuthProvider, useAuth } from './AuthContext';
-import { authService } from '../services/authService';
-import { User } from '../types';
+import { AuthProvider, useAuth } from '../AuthContext';
+import { authService } from '../../services/authService';
+import { User } from '../../types';
 
-jest.mock('../services/authService');
+jest.mock('../../services/authService');
 
 const mockUser: User = {
   id: 1,

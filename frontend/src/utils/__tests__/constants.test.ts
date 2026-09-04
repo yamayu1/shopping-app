@@ -5,7 +5,7 @@ import {
   VALIDATION_RULES,
   CURRENCY,
   ERROR_MESSAGES,
-} from './constants';
+} from '../constants';
 
 describe('constants', () => {
   describe('STORAGE_KEYS', () => {

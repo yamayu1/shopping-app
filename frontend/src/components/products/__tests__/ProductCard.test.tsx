@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import ProductCard from './ProductCard';
-import { Product } from '../../types';
+import ProductCard from '../ProductCard';
+import { Product } from '../../../types';
 
 const mockProduct: Product = {
   id: 1,
