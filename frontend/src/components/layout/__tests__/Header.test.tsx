@@ -1,14 +1,14 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import Header from './Header';
-import { useAuth } from '../../contexts/AuthContext';
-import { adminAuthService } from '../../services/adminAuthService';
-import { useCart } from '../../contexts/CartContext';
+import Header from '../Header';
+import { useAuth } from '../../../contexts/AuthContext';
+import { adminAuthService } from '../../../services/adminAuthService';
+import { useCart } from '../../../contexts/CartContext';
 
-jest.mock('../../contexts/AuthContext');
-jest.mock('../../contexts/CartContext');
-jest.mock('../../services/adminAuthService', () => ({
+jest.mock('../../../contexts/AuthContext');
+jest.mock('../../../contexts/CartContext');
+jest.mock('../../../services/adminAuthService', () => ({
   adminAuthService: {
     isAuthenticated: jest.fn().mockReturnValue(false),
     logout: jest.fn(),

@@ -2,10 +2,10 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import LoginForm from './LoginForm';
-import { useAuth } from '../../contexts/AuthContext';
+import LoginForm from '../LoginForm';
+import { useAuth } from '../../../contexts/AuthContext';
 
-jest.mock('../../contexts/AuthContext');
+jest.mock('../../../contexts/AuthContext');
 
 const mockedUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 

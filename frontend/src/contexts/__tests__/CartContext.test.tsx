@@ -1,10 +1,10 @@
 import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { CartProvider, useCart } from './CartContext';
-import { cartService } from '../services/cartService';
-import { Cart } from '../types';
+import { CartProvider, useCart } from '../CartContext';
+import { cartService } from '../../services/cartService';
+import { Cart } from '../../types';
 
-jest.mock('../services/cartService');
+jest.mock('../../services/cartService');
 
 const mockCart: Cart = {
   id: 1,

@@ -8,7 +8,7 @@ import {
   calculateCartTotal,
   calculateTax,
   calculateShipping,
-} from './helpers';
+} from '../helpers';
 
 describe('helpers', () => {
   describe('formatCurrency', () => {
