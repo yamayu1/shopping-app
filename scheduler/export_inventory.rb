@@ -8,11 +8,11 @@ puts "在庫エクスポート開始: #{Time.now}"
 
 # データベース設定
 DB_CONFIG = {
-  host: ENV.fetch('DB_HOST', 'mysql'),
-  port: ENV.fetch('DB_PORT', 3306).to_i,
-  username: ENV.fetch('DB_USERNAME', 'shopping_user'),
-  password: ENV.fetch('DB_PASSWORD', 'shopping_password'),
-  database: ENV.fetch('DB_DATABASE', 'shopping_development')
+  host: ENV.fetch('DB_HOST'),
+  port: ENV.fetch('DB_PORT').to_i,
+  username: ENV.fetch('DB_USERNAME'),
+  password: ENV.fetch('DB_PASSWORD'),
+  database: ENV.fetch('DB_DATABASE')
 }
 
 begin
