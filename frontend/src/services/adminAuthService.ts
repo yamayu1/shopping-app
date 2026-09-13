@@ -53,6 +53,14 @@ export interface AdminLoginForm {
   password: string;
 }
 
+export interface AdminRegisterForm {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+  role: string;
+}
+
 interface AdminLoginResponse {
   success: boolean;
   message: string;
@@ -115,6 +123,12 @@ export const adminAuthService = {
       }
       throw new Error('ログインに失敗しました');
     }
+  },
+
+  // 管理者登録（スーパー管理者のみ実行可能）
+  registerAdmin: async (data: AdminRegisterForm): Promise<AdminUser> => {
+    const response = await adminApiClient.post('/admin/auth/register', data);
+    return response.data.data.admin;
   },
 
   // 管理者ログアウト

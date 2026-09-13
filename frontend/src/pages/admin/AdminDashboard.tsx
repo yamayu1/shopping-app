@@ -25,6 +25,7 @@ import { adminInventoryService } from '../../services/adminInventoryService';
 import { formatCurrency } from '../../utils/helpers';
 import { ROUTES, ORDER_STATUS_OPTIONS } from '../../utils/constants';
 import { Order } from '../../types';
+import { adminAuthService } from '../../services/adminAuthService';
 
 interface DashboardStats {
   totalOrders: number;
@@ -35,6 +36,7 @@ interface DashboardStats {
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const storedAdmin = adminAuthService.getStoredAdmin();
   const [stats, setStats] = useState<DashboardStats>({
     totalOrders: 0,
     totalRevenue: 0,
@@ -326,6 +328,25 @@ const AdminDashboard: React.FC = () => {
                     </Typography>
                   </CardContent>
                 </Card>
+                {storedAdmin?.role === 'super_admin' && (
+                  <Card
+                    sx={{
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        bgcolor: 'primary.50',
+                        transform: 'translateX(4px)',
+                      },
+                    }}
+                    onClick={() => navigate(ROUTES.ADMIN_REGISTER)}
+                  >
+                    <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        管理者登録
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                )}
                 <Card
                   sx={{
                     cursor: 'pointer',

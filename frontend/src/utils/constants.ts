@@ -32,6 +32,7 @@ export const ROUTES = {
   ADMIN_USERS: '/admin/users',
   ADMIN_INVENTORY: '/admin/inventory',
   ADMIN_CATEGORIES: '/admin/categories',
+  ADMIN_REGISTER: '/admin/register',
 };
 
 // ページネーション

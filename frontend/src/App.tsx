@@ -30,6 +30,7 @@ import AdminInventory from './pages/admin/AdminInventory';
 import AdminCategories from './pages/admin/AdminCategories';
 import NotFoundPage from './pages/NotFoundPage';
 import theme from './styles/theme';
+import AdminRegister from './pages/admin/AdminRegister';
 
 const App: React.FC = () => {
   return (
@@ -74,6 +75,7 @@ const App: React.FC = () => {
                 <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
                 <Route path="/admin/inventory" element={<ProtectedRoute adminOnly><AdminInventory /></ProtectedRoute>} />
                 <Route path="/admin/categories" element={<ProtectedRoute adminOnly><AdminCategories /></ProtectedRoute>} />
+                <Route path="/admin/register" element={<ProtectedRoute adminOnly><AdminRegister /></ProtectedRoute>} />
 
                 {/* 404ページ */}
                 <Route path="*" element={<NotFoundPage />} />
