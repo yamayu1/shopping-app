@@ -1,22 +1,19 @@
 class OrdersController < ApplicationController
   def index
-    @orders = current_user.orders
-                          .includes(:address, order_items: :product)
-                          .recent
-                          .page(params[:page])
-                          .per(params[:per_page] || 10)
-    
+    orders = current_user.orders
+                        .includes(:address, order_items: :product)
+                        .recent
+
+    # ステータス指定があり、かつ正しい値のときだけ絞り込む
+    if params[:status].present? && Order.statuses.key?(params[:status])
+      orders = orders.where(status: params[:status])
+    end
+
+    @orders = orders.page(params[:page]).per(params[:per_page] || 10)
+
     render_success({
       orders: @orders.map { |order| order_data(order) },
       pagination: pagination_data(@orders)
-    })
-  end
-
-  def show
-    @order = current_user.orders.includes(:address, order_items: :product).find(params[:id])
-    
-    render_success({
-      order: order_data(@order, detailed: true)
     })
   end
 

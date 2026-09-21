@@ -32,4 +32,25 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
     data = json_response
     assert_equal true, data[:success]
   end
+
+  def test_index_filters_by_status
+    create(:order, :shipped, user: @user, address: @address)
+    create(:order, user: @user, address: @address) 
+    get '/api/orders', params: { status: 'shipped' }, headers: @headers
+
+    assert_equal 200, response.status
+    orders = json_response[:data][:orders]
+    assert_equal 1, orders.length 
+    assert_equal 'shipped', orders.first[:status]
+  end
+
+  def test_index_without_status_returns_all
+    create(:order, :shipped, user: @user, address: @address)
+    create(:order, user: @user, address: @address)
+
+    get '/api/orders', headers: @headers
+
+    assert_equal 200, response.status
+    assert_equal 2, json_response[:data][:orders].length
+  end
 end
